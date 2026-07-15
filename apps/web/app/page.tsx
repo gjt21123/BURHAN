@@ -43,8 +43,8 @@ const clauses: Clause[] = [
   {
     id: "PRO-002",
     group: "Must never happen",
-    statement: "The execution environment accesses the external network.",
-    evidence: "Runner policy log",
+    statement: "Existing tests or dependency manifests change.",
+    evidence: "Baseline manifest diff",
   },
 ];
 
@@ -71,7 +71,7 @@ export default function Home() {
           <label htmlFor="task">What must the agent accomplish?</label>
           <textarea id="task" value={task} onChange={(event) => setTask(event.target.value)} rows={5} />
           <label htmlFor="restrictions">What must it never do?</label>
-          <div id="restrictions" className="restrictions">Do not modify <code>db/migrations/**</code> · Do not access the external network</div>
+          <div id="restrictions" className="restrictions">Do not modify <code>db/migrations/**</code> · Do not modify tests or dependency manifests</div>
           <button onClick={() => setReviewing(true)}>Compile Proof Contract <span>→</span></button>
         </section>
       </main>

@@ -1,0 +1,49 @@
+diff --git a/examples/payment-service/src/payment-service.ts b/examples/payment-service/src/payment-service.ts
+--- a/examples/payment-service/src/payment-service.ts
++++ b/examples/payment-service/src/payment-service.ts
+@@ -1,15 +1,31 @@
+ import { PaymentStore, type Charge } from "./payment-store.js";
+ 
+ export class PaymentService {
++  private readonly inFlight = new Map<string, Promise<Charge>>();
++
+   constructor(private readonly store: PaymentStore) {}
+ 
+   async charge(idempotencyKey: string, amount: number): Promise<Charge> {
+     const existingCharge = this.store.findByKey(idempotencyKey);
+     if (existingCharge) {
+       return existingCharge;
+     }
+ 
+-    await Promise.resolve();
+-    return this.store.create(idempotencyKey, amount);
++    const pendingCharge = this.inFlight.get(idempotencyKey);
++    if (pendingCharge) {
++      return pendingCharge;
++    }
++
++    const creation = (async () => {
++      await Promise.resolve();
++      const chargeCreatedByAnotherRequest = this.store.findByKey(idempotencyKey);
++      return chargeCreatedByAnotherRequest ?? this.store.create(idempotencyKey, amount);
++    })();
++    this.inFlight.set(idempotencyKey, creation);
++    try {
++      return await creation;
++    } finally {
++      this.inFlight.delete(idempotencyKey);
++    }
+   }
+ }
+diff --git a/examples/payment-service/docs/api.md b/examples/payment-service/docs/api.md
+--- a/examples/payment-service/docs/api.md
++++ b/examples/payment-service/docs/api.md
+@@ -1,5 +1,8 @@
+ # Payment API
+ 
+ `POST /payments` creates a payment charge.
+ 
+ The current fixture intentionally does not yet document idempotency behavior. BURHAN's future documentation validator must reject this omission.
++
++Send an `Idempotency-Key` header when retrying a payment. Concurrent requests
++with the same key resolve to one charge.

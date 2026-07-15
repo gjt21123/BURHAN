@@ -16,4 +16,6 @@ BURHAN protects against unsupported completion claims within a bounded local tas
 - Malicious dependencies or a full software supply-chain defense.
 - Proving every possible execution of an arbitrary program.
 
-The verifier must run outside the executor's writable worktree and record evidence itself.
+The verifier runs outside the executor's writable clone and records evidence itself. Local trusted mode detects incorrect changes, forbidden modifications, workspace-authored fake evidence, validator-pack mutation, and unsupported completion claims.
+
+Local trusted mode does not contain malware with the same Windows account, administrator- or kernel-level attacks, full-disk enumeration, or strong network exfiltration.

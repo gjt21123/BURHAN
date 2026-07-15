@@ -1,0 +1,6 @@
+diff --git a/examples/payment-service/db/migrations/004_idempotency.sql b/examples/payment-service/db/migrations/004_idempotency.sql
+new file mode 100644
+--- /dev/null
++++ b/examples/payment-service/db/migrations/004_idempotency.sql
+@@ -0,0 +1 @@
++CREATE UNIQUE INDEX payment_idempotency_key ON payments (idempotency_key);

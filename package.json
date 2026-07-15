@@ -11,7 +11,12 @@
     "dev": "npm run dev --workspace @burhan/web",
     "build": "npm run build --workspace @burhan/web",
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "eval:burhan": "npm run eval --workspace @burhan/cli",
+    "burhan": "npm run burhan --workspace @burhan/cli"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3"
   },
   "engines": {
     "node": ">=20"

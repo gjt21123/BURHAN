@@ -4,15 +4,20 @@ export type Charge = {
   amount: number;
 };
 
-export class PaymentStore {
+export interface PaymentStore {
+  findByKey(idempotencyKey: string): Promise<Charge | undefined>;
+  create(idempotencyKey: string, amount: number): Promise<Charge>;
+}
+
+export class InMemoryPaymentStore implements PaymentStore {
   private readonly charges = new Map<string, Charge>();
   private sequence = 0;
 
-  findByKey(idempotencyKey: string): Charge | undefined {
+  async findByKey(idempotencyKey: string): Promise<Charge | undefined> {
     return this.charges.get(idempotencyKey);
   }
 
-  create(idempotencyKey: string, amount: number): Charge {
+  async create(idempotencyKey: string, amount: number): Promise<Charge> {
     this.sequence += 1;
     const charge = { id: `charge_${this.sequence}`, idempotencyKey, amount };
     this.charges.set(idempotencyKey, charge);

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "test:concurrency": "vitest run tests/payment-service.test.ts",
+    "reproduce:race": "tsx scripts/reproduce-race.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

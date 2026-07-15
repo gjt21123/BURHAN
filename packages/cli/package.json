@@ -1,0 +1,23 @@
+{
+  "name": "@burhan/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "burhan": "tsx src/index.ts",
+    "eval": "tsx src/index.ts eval",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@burhan/core": "0.1.0",
+    "@burhan/verifier": "0.1.0",
+    "@burhan/workspace": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.8"
+  }
+}

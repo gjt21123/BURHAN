@@ -24,7 +24,8 @@ export const clauseSchema = z.object({
   sourceReference: z.string().optional(),
   evidenceStrategy: z.object({
     mode: evidenceModeSchema,
-    deterministic: z.boolean(),
+    evidenceClass: z.enum(["deterministic", "semantic", "human_attestation"]),
+    requiredAssurance: z.enum(["proven", "supported", "attested", "unverified"]),
   }),
 });
 

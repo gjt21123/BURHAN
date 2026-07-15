@@ -1,5 +1,5 @@
 {
-  "name": "@burhan/core",
+  "name": "@burhan/workspace",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,10 +8,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "zod": "^3.24.2"
-  },
   "devDependencies": {
+    "@types/node": "^22.13.4",
     "typescript": "^5.7.3",
     "vitest": "^3.0.8"
   }

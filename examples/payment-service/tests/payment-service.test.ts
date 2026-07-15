@@ -1,21 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { PaymentService } from "../src/payment-service.js";
-import { PaymentStore } from "../src/payment-store.js";
+import { InMemoryPaymentStore } from "../src/payment-store.js";
 
-describe("payment idempotency counterexample", () => {
-  it("reproduces the duplicate-charge race deterministically", async () => {
-    const store = new PaymentStore();
+describe("payment service regression behavior", () => {
+  it("returns the existing charge for a sequential retry", async () => {
+    const store = new InMemoryPaymentStore();
     const service = new PaymentService(store);
 
-    await Promise.all(
-      Array.from({ length: 20 }, () => service.charge("retry-42", 100)),
-    );
+    const first = await service.charge("retry-42", 100);
+    const second = await service.charge("retry-42", 100);
 
-    expect(store.countCreated()).toBe(20);
+    expect(first.id).toBe(second.id);
+    expect(store.countCreated()).toBe(1);
   });
 
   it("keeps distinct idempotency keys independent", async () => {
-    const store = new PaymentStore();
+    const store = new InMemoryPaymentStore();
     const service = new PaymentService(store);
 
     await Promise.all([

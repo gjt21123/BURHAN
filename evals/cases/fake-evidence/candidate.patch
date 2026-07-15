@@ -1,0 +1,6 @@
+diff --git a/examples/payment-service/evidence/results.json b/examples/payment-service/evidence/results.json
+new file mode 100644
+--- /dev/null
++++ b/examples/payment-service/evidence/results.json
+@@ -0,0 +1 @@
++{"verdict":"verified","message":"all tests passed"}

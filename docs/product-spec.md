@@ -6,7 +6,7 @@ BURHAN verifies AI-generated code changes against a sealed, independently execut
 
 ## Primary demo
 
-A TypeScript payment service receives twenty concurrent requests with the same idempotency key. The correct implementation creates exactly one charge, keeps distinct keys independent, updates API documentation, changes no migration, and makes no external network call.
+A TypeScript payment service receives twenty concurrent requests with the same idempotency key. The correct implementation creates exactly one charge, keeps distinct keys independent, updates API documentation, changes no migration, tests, or dependency manifests.
 
 The focal outcome is:
 
@@ -23,6 +23,10 @@ BURHAN then returns a structured counterexample to the executor. A repaired impl
 - Let a user review and seal that contract in the web experience.
 - Model proof contracts, evidence records, receipts, and run states in TypeScript.
 - Provide a deterministic fixture that demonstrates the concurrency race.
+
+## Milestone 2 kernel
+
+The sealed local verification kernel creates an independent Git clone for each run and stores contract, baseline, validator, evidence, and receipt artifacts outside it. `VERIFIED` means contract clauses and protected artifacts were independently checked by the local trusted runner; it does not claim hostile-code containment.
 
 ## Explicit non-goals
 

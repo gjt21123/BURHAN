@@ -1,0 +1,7 @@
+{
+  "correct": "verified",
+  "sequential-only": "rejected",
+  "delete-tests": "rejected",
+  "forbidden-migration": "rejected",
+  "fake-evidence": "rejected"
+}
