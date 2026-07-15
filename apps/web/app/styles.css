@@ -1,0 +1,35 @@
+:root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background: #0b0e14; color: #f4f5f7; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 90% 5%, #233653, transparent 30rem), #0b0e14; }
+button, textarea { font: inherit; }
+.shell { width: min(1100px, calc(100% - 40px)); margin: 0 auto; padding: 92px 0; }
+.hero { max-width: 700px; margin-bottom: 44px; }
+.eyebrow { color: #80d9be; font-size: .72rem; font-weight: 700; letter-spacing: .16em; margin: 0 0 16px; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.8rem); letter-spacing: -.06em; line-height: .95; margin: 0; }
+.review-header h1 { font-size: clamp(2rem, 4vw, 3.5rem); }
+.lede, .review-header > div > p:not(.eyebrow) { color: #abb4c3; font-size: 1.1rem; line-height: 1.6; }
+.card { background: rgba(21, 27, 39, .84); border: 1px solid #283246; border-radius: 16px; box-shadow: 0 16px 45px rgba(0, 0, 0, .2); }
+.define-card { display: grid; gap: 12px; max-width: 760px; padding: 28px; }
+label { color: #d8dce4; font-size: .9rem; font-weight: 700; }
+textarea, .restrictions { width: 100%; border: 1px solid #354159; border-radius: 10px; background: #101621; color: #eef1f5; padding: 15px; line-height: 1.5; }
+textarea:focus { border-color: #80d9be; outline: none; }
+.restrictions { color: #c9d0dc; }
+code { color: #80d9be; }
+button { border: 0; border-radius: 9px; background: #80d9be; color: #0b1a18; cursor: pointer; font-weight: 800; margin-top: 12px; padding: 14px 18px; }
+button:hover { background: #a1f3d9; }
+button:disabled { cursor: default; opacity: .65; }
+.review-header { align-items: center; display: flex; justify-content: space-between; gap: 28px; margin-bottom: 32px; }
+.seal { border: 1px solid #48536a; border-radius: 999px; color: #c7ceda; font-size: .75rem; font-weight: 800; letter-spacing: .12em; padding: 10px 13px; }
+.seal.sealed { border-color: #80d9be; color: #80d9be; }
+.contract-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.clause-group { padding: 22px; }
+.clause-group h2 { color: #80d9be; font-size: .78rem; letter-spacing: .08em; margin: 0 0 20px; text-transform: uppercase; }
+.clause { border-top: 1px solid #29344a; padding: 15px 0; }
+.clause:last-child { padding-bottom: 0; }
+.clause span { color: #93a3bd; font: 700 .75rem ui-monospace, monospace; }
+.clause p, .ambiguity p { font-size: .95rem; line-height: 1.5; margin: 7px 0; }
+.clause small { color: #a9b1bf; }
+.review-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+.secondary { background: transparent; border: 1px solid #48536a; color: #e1e5ec; }
+.sealed-message { color: #80d9be; margin: 20px 0 0; text-align: right; }
+@media (max-width: 700px) { .shell { padding: 48px 0; } .contract-grid { grid-template-columns: 1fr; } .review-header { align-items: flex-start; flex-direction: column; } }
