@@ -22,3 +22,9 @@
 
 - Codex added SpecForge schemas, a secret-excluding deterministic fact-pack builder, capability catalog, source/capability linter, canonical approval normalization, and fixture compiler evaluations.
 - Codex wired GPT-5.6 Structured Outputs server-side only through the Responses API; absent API credentials produce the explicit `API_KEY_MISSING` live-eval state.
+
+## Milestone 4A
+
+- Codex added shared structured agent schemas and fixture-only ValidatorBlueprint intake; no live Codex request is made.
+- Codex added a deterministic blueprint linter, trusted capability templates, manifest hashing, sealing, qualification controls, and a copied-pack tamper probe.
+- Codex added the qualification reducer states and a read-only result component. Human product decisions retained: model-authored commands and arbitrary test code are forbidden, control catalog paths remain internal, and qualification precedes pack sealing.

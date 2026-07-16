@@ -1,0 +1,22 @@
+{
+  "name": "@burhan/validator-qualification",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx src/eval-runner.ts"
+  },
+  "dependencies": {
+    "@burhan/core": "0.1.0",
+    "@burhan/validator-compiler": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.8"
+  }
+}

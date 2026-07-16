@@ -15,6 +15,8 @@
     "eval:burhan": "npm run eval --workspace @burhan/cli",
     "eval:compiler:fixtures": "npm run eval:fixtures --workspace @burhan/specforge",
     "eval:compiler:live": "npm run eval:live --workspace @burhan/specforge",
+    "eval:codex:fixtures": "npm run eval:fixtures --workspace @burhan/codex-runner",
+    "eval:validator-qualification": "npm run eval --workspace @burhan/validator-qualification",
     "burhan": "npm run burhan --workspace @burhan/cli"
   },
   "devDependencies": {

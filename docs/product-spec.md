@@ -32,6 +32,10 @@ The sealed local verification kernel creates an independent Git clone for each r
 
 SpecForge compiles a natural-language task plus a deterministic repository fact pack into an untrusted `ContractDraft`. GPT-5.6 supplies only the draft through Structured Outputs. A deterministic linter, explicit human approval, canonical normalization, and hashing produce the sealed `ProofContract` used by the verification kernel.
 
+## Milestone 4A validator qualification
+
+A future Codex Validator Architect supplies a structured `ValidatorBlueprint`, never arbitrary test source or commands. BURHAN lints that blueprint against the sealed contract and fact-pack paths, compiles only trusted validator templates, then qualifies the pack against two distinct correct strategies and four known incorrect controls. A pack is sealed only after zero false accepts, zero false rejects, complete clause coverage, and a successful tamper probe.
+
 ## Explicit non-goals
 
 - No model integrations or external agent execution yet.

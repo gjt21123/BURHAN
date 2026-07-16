@@ -1,7 +1,7 @@
 # Architecture
 
 ```text
-Intent → ProofContract → Seal → Executor workspace → Independent verifier → ProofReceipt
+Intent → ProofContract → Seal → ValidatorBlueprint → Trusted validator compiler → Qualification gate → Executor workspace → Independent verifier → ProofReceipt
 ```
 
 The executor and verifier have separate trust boundaries. An executor may edit its working tree but must not edit validator files, create evidence records, or issue its own receipt.
@@ -32,3 +32,7 @@ Every run uses an independent `git clone --no-hardlinks` workspace under `.burha
 ## SpecForge boundary
 
 `task + RepositoryFactPack → GPT-5.6 ContractDraft → deterministic linter → human approval → ProofContract`. Repository facts exclude secrets, Git metadata, build output, binaries, and protected BURHAN paths. The model selects only capability IDs from the fact pack and never emits commands, validator definitions, evidence, or a verdict.
+
+## Validator qualification boundary
+
+`ValidatorBlueprint` is untrusted structured input. It can name an approved capability, sealed clause, bounded parameters, and fact-pack path only. The `validator-compiler` owns all executable templates and seals the generated manifest with file hashes. The qualification package alone owns control implementations; their paths and oracle behavior never enter the blueprint. Qualification checks two positive strategies and four targeted negatives before the core reducer permits `VALIDATOR_PACK_SEALED`.

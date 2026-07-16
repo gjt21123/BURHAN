@@ -40,4 +40,15 @@ describe("proof contract", () => {
     expect(sealed.state).toBe("SEALED");
     expect(() => reduceRun({ state: "DRAFT" }, { type: "RECEIPT_ISSUED", receiptId: "r" })).toThrow("Invalid event");
   });
+
+  it("requires validator qualification before a validator pack is sealed", () => {
+    let model = reduceRun({ state: "DRAFT" }, { type: "CONTRACT_SEALED" });
+    model = reduceRun(model, { type: "VALIDATOR_BLUEPRINT_BUILD_STARTED" });
+    model = reduceRun(model, { type: "VALIDATOR_BLUEPRINT_READY" });
+    model = reduceRun(model, { type: "VALIDATOR_BLUEPRINT_LINTED" });
+    model = reduceRun(model, { type: "VALIDATOR_PACK_QUALIFICATION_STARTED" });
+    model = reduceRun(model, { type: "VALIDATOR_PACK_QUALIFIED" });
+    model = reduceRun(model, { type: "VALIDATOR_PACK_SEALING_STARTED" });
+    expect(reduceRun(model, { type: "VALIDATOR_PACK_SEALED" }).state).toBe("VALIDATOR_PACK_SEALED");
+  });
 });
