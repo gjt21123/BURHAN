@@ -28,3 +28,7 @@ Evidence is deterministic where possible: commands, exit codes, content hashes, 
 ## Kernel trust boundaries
 
 Every run uses an independent `git clone --no-hardlinks` workspace under `.burhan/workspaces/<runId>`. Protected artifacts live under `%LOCALAPPDATA%/BURHAN/runs/<runId>`, outside Git and the candidate workspace. The Windows-native parent process uses an allowlisted command, a sanitized environment, output caps, timeouts, and evidence written atomically. A verdict carries `local_trusted` execution assurance, not operating-system containment.
+
+## SpecForge boundary
+
+`task + RepositoryFactPack → GPT-5.6 ContractDraft → deterministic linter → human approval → ProofContract`. Repository facts exclude secrets, Git metadata, build output, binaries, and protected BURHAN paths. The model selects only capability IDs from the fact pack and never emits commands, validator definitions, evidence, or a verdict.

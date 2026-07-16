@@ -28,6 +28,10 @@ BURHAN then returns a structured counterexample to the executor. A repaired impl
 
 The sealed local verification kernel creates an independent Git clone for each run and stores contract, baseline, validator, evidence, and receipt artifacts outside it. `VERIFIED` means contract clauses and protected artifacts were independently checked by the local trusted runner; it does not claim hostile-code containment.
 
+## Milestone 3 SpecForge
+
+SpecForge compiles a natural-language task plus a deterministic repository fact pack into an untrusted `ContractDraft`. GPT-5.6 supplies only the draft through Structured Outputs. A deterministic linter, explicit human approval, canonical normalization, and hashing produce the sealed `ProofContract` used by the verification kernel.
+
 ## Explicit non-goals
 
 - No model integrations or external agent execution yet.

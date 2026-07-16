@@ -1,0 +1,5 @@
+import { z } from "zod";
+import { draftClauseTypeSchema, evidenceClassSchema } from "./contract-draft.js";
+
+export const repositoryFactPackSchema = z.object({ schemaVersion: z.literal("1"), repository: z.object({ name: z.string(), baselineCommit: z.string(), primaryLanguage: z.string(), packageManager: z.string() }), execution: z.object({ assurance: z.literal("local_trusted"), operatingSystem: z.literal("windows") }), files: z.object({ sourcePaths: z.array(z.string()), testPaths: z.array(z.string()), documentationPaths: z.array(z.string()), migrationPaths: z.array(z.string()) }), scripts: z.array(z.object({ name: z.string(), command: z.string() })), packageManifest: z.object({ runtimeDependencies: z.array(z.string()), developmentDependencies: z.array(z.string()), manifestHash: z.string(), lockfileHash: z.string().nullable() }), verifierCapabilities: z.array(z.object({ id: z.string(), description: z.string(), supportedEvidenceClass: evidenceClassSchema, supportedClauseTypes: z.array(draftClauseTypeSchema) })), limitations: z.array(z.string()) });
+export type RepositoryFactPack = z.infer<typeof repositoryFactPackSchema>;

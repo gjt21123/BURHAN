@@ -13,6 +13,8 @@
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "eval:burhan": "npm run eval --workspace @burhan/cli",
+    "eval:compiler:fixtures": "npm run eval:fixtures --workspace @burhan/specforge",
+    "eval:compiler:live": "npm run eval:live --workspace @burhan/specforge",
     "burhan": "npm run burhan --workspace @burhan/cli"
   },
   "devDependencies": {

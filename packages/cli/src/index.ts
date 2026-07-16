@@ -44,7 +44,7 @@ async function runEvaluation(): Promise<void> {
 
 async function evaluateCase(caseId: string, tamper = false): Promise<string> {
   const repositoryRoot = (await run("git", ["rev-parse", "--show-toplevel"], process.cwd())).stdout.trim();
-  const baselineCommit = (await run("git", ["rev-parse", "HEAD"], repositoryRoot)).stdout.trim();
+  const baselineCommit = (await run("git", ["rev-parse", "milestone-1"], repositoryRoot)).stdout.trim();
   const runId = `eval-${caseId}-${crypto.randomUUID().slice(0, 8)}`;
   const runPath = await createRunDirectory(repositoryRoot, { runId, baselineCommit });
   const workspacePath = await createIndependentClone(repositoryRoot, runId, baselineCommit);

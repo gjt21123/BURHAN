@@ -1,0 +1,10 @@
+import { z } from "zod";
+
+export const draftClauseTypeSchema = z.enum(["outcome", "invariant", "prohibition", "documentation"]);
+export const evidenceClassSchema = z.enum(["deterministic", "semantic", "human_attestation"]);
+export const verificationStrategySchema = z.enum(["existing_validator", "generated_validator_required", "diff_policy", "file_manifest", "structural_document_check", "semantic_review", "human_attestation", "unsupported"]);
+export const sourceReferenceSchema = z.object({ sourceId: z.string().min(1), sourceType: z.enum(["user_task", "repository_fact", "user_clarification"]), excerpt: z.string().min(1) });
+export const contractDraftClauseSchema = z.object({ temporaryId: z.string().min(1), type: draftClauseTypeSchema, statement: z.string().min(1), normalizedStatement: z.string().min(1), severity: z.enum(["critical", "high", "medium"]), origin: z.enum(["explicit_user_requirement", "explicit_repository_fact", "inferred_requirement"]), sourceReferences: z.array(sourceReferenceSchema), verificationPlan: z.object({ strategy: verificationStrategySchema, capabilityId: z.string().nullable(), evidenceClass: evidenceClassSchema, expectedObservation: z.string(), unsupportedReason: z.string().nullable() }), rationale: z.string() });
+export const contractDraftSchema = z.object({ compilationStatus: z.enum(["ready_for_review", "needs_clarification", "unsupported"]), inputLanguage: z.enum(["en", "ar", "unknown"]), normalizedGoal: z.string(), conciseTitle: z.string(), clauses: z.array(contractDraftClauseSchema), ambiguities: z.array(z.object({ id: z.string(), question: z.string(), whyItMatters: z.string(), affectedClauseIds: z.array(z.string()), blocking: z.boolean() })), unsupportedConstraints: z.array(z.object({ statement: z.string(), reason: z.string(), suggestedReplacement: z.string().nullable() })), assumptions: z.array(z.object({ statement: z.string(), requiresHumanConfirmation: z.boolean() })), warnings: z.array(z.string()) });
+export type ContractDraft = z.infer<typeof contractDraftSchema>;
+export type DraftClauseType = z.infer<typeof draftClauseTypeSchema>;
