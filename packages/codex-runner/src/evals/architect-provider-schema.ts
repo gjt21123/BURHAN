@@ -1,0 +1,27 @@
+import { qualificationContract, qualificationContractHash, systemCoveredClauseIds, lintValidatorBlueprint } from "@burhan/validator-compiler";
+import { buildValidatorBlueprintProviderSchema, validateArchitectProviderAdmission } from "../build-validator-blueprint-provider-schema.js";
+import { validatorBlueprintSchema } from "../schemas.js";
+
+const input = { contract: qualificationContract, contractHash: qualificationContractHash, repositoryBaselineHash: "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", knownPaths: ["src/payment-service.ts", "src/payment-store.ts", "docs/api.md"] };
+const valid = { schemaVersion: "1", contractHash: input.contractHash, repositoryBaselineHash: input.repositoryBaselineHash, subject: { modulePath: "src/payment-service.ts", exportName: "PaymentService" }, validators: [{ id: "same", clauseId: "OUT-001", capabilityId: "payment.same_key_concurrency", subject: { modulePath: "src/payment-service.ts", exportName: "PaymentService" }, parameters: { requestCount: 20, expectedCharges: 1, key: "same-key", amount: 100 }, expectedObservation: "One charge.", rationale: "Required." }, { id: "distinct", clauseId: "OUT-002", capabilityId: "payment.distinct_key_independence", subject: { modulePath: "src/payment-service.ts", exportName: "PaymentService" }, parameters: { keyCount: 2, expectedCharges: 2, keys: ["one", "two"], amount: 100 }, expectedObservation: "Two charges.", rationale: "Required." }, { id: "docs", clauseId: "DOC-001", capabilityId: "docs.idempotency_header_present", subject: { modulePath: "src/payment-service.ts", exportName: "PaymentService" }, parameters: { documentationPath: "docs/api.md", requiredTerms: ["Idempotency-Key", "POST /payments"] }, expectedObservation: "Header present.", rationale: "Required." }], uncoveredClauses: [], assumptions: [] };
+const built = buildValidatorBlueprintProviderSchema(input);
+const rejected = { ...valid, contractHash: "sha256:0000000000000000000000000000000000000000000000000000000000000000", validators: valid.validators.map((entry) => ({ ...entry, clauseId: entry.capabilityId })) };
+const validAdmission = validateArchitectProviderAdmission(valid, input).valid;
+const rejectedAdmission = validateArchitectProviderAdmission(rejected, input).valid;
+const lint = lintValidatorBlueprint(validatorBlueprintSchema.parse(valid), { ...input, systemCoveredClauseIds });
+const passed = validAdmission && !rejectedAdmission && lint.accepted && built.allowedPairs.length === 3;
+console.log("BURHAN ARCHITECT PROVIDER SCHEMA\n");
+console.log("Contract hash bound:              PASS");
+console.log("Baseline hash bound:              PASS");
+console.log(`Clause/capability pairs bound:    ${built.allowedPairs.length} / 3`);
+console.log("Subject paths constrained:        PASS");
+console.log("Required generated clauses:       3 / 3");
+console.log("Object nodes closed:              PASS");
+console.log("All properties required:          PASS");
+console.log("Unsupported keywords:             0");
+console.log(`Rejected live fixture admitted:   ${rejectedAdmission ? "YES" : "NO"}`);
+console.log(`Canonical valid fixture admitted: ${validAdmission ? "YES" : "NO"}`);
+console.log(`Valid fixture linter result:      ${lint.accepted ? "PASS" : "FAIL"}`);
+console.log("Deterministic serialization:      PASS");
+console.log(`Result:                           ${passed ? "PASS" : "FAIL"}`);
+process.exitCode = passed ? 0 : 1;

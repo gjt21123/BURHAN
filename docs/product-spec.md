@@ -36,6 +36,10 @@ SpecForge compiles a natural-language task plus a deterministic repository fact 
 
 A future Codex Validator Architect supplies a structured `ValidatorBlueprint`, never arbitrary test source or commands. BURHAN lints that blueprint against the sealed contract and fact-pack paths, compiles only trusted validator templates, then qualifies the pack against two distinct correct strategies and four known incorrect controls. A pack is sealed only after zero false accepts, zero false rejects, complete clause coverage, and a successful tamper probe.
 
+## Milestone 4B independent execution
+
+Codex can act as a separate executor, but its `AgentExecutionClaim` cannot issue a BURHAN verdict. BURHAN captures the real patch from an isolated target repository and verifies it in a fresh third workspace. `VERIFIED`, `REJECTED`, and `INCOMPLETE` remain deterministic BURHAN outcomes with `local_trusted` assurance.
+
 ## Explicit non-goals
 
 - No model integrations or external agent execution yet.

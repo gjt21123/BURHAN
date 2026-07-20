@@ -36,3 +36,7 @@ Every run uses an independent `git clone --no-hardlinks` workspace under `.burha
 ## Validator qualification boundary
 
 `ValidatorBlueprint` is untrusted structured input. It can name an approved capability, sealed clause, bounded parameters, and fact-pack path only. The `validator-compiler` owns all executable templates and seals the generated manifest with file hashes. The qualification package alone owns control implementations; their paths and oracle behavior never enter the blueprint. Qualification checks two positive strategies and four targeted negatives before the core reducer permits `VALIDATOR_PACK_SEALED`.
+
+## Codex executor boundary
+
+Codex runs only in an independently materialized target repository under local application data. BURHAN captures its staged binary patch, including untracked files, then applies that captured patch to a third fresh workspace. The executor claim is public metadata only: the fresh workspace, qualified pack hashes, deterministic policies, and independent checks determine the verdict.

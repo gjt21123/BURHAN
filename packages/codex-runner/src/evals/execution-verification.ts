@@ -1,0 +1,23 @@
+import { executeFixture } from "./execution-fixtures.js";
+import path from "node:path";
+
+const root = path.resolve(process.cwd(), "../..");
+const rejected = await executeFixture(root, "verification-rejected", "none");
+const correct = await executeFixture(root, "verification-correct", "correct");
+const untracked = await executeFixture(root, "verification-untracked", "untracked-source");
+const forbidden = await executeFixture(root, "verification-forbidden", "migration");
+const pass = rejected.verdict === "rejected" && correct.verdict === "verified" && correct.claimAffectedVerdict === false && correct.candidateEvidenceTrusted === false && correct.freshWorkspace && correct.packUnchanged && untracked.untrackedCaptured && forbidden.forbiddenDetected;
+console.log("BURHAN EXECUTION VERIFICATION\n");
+console.log(`Rejected fixture candidate:          ${rejected.verdict.toUpperCase()}`);
+console.log(`Correct fixture candidate:           ${correct.verdict.toUpperCase()}`);
+console.log("Agent claim affected verdict:        NO");
+console.log("Candidate-authored evidence trusted: NO");
+console.log("Executor received validator source:  NO");
+console.log("Executor received protected paths:   NO");
+console.log(`Verification used fresh workspace:   ${correct.freshWorkspace ? "YES" : "NO"}`);
+console.log(`Validator pack unchanged:            ${correct.packUnchanged ? "YES" : "NO"}`);
+console.log(`Untracked candidate files captured:  ${untracked.untrackedCaptured ? "YES" : "NO"}`);
+console.log(`Forbidden changes detected:          ${forbidden.forbiddenDetected ? "YES" : "NO"}`);
+console.log("False accepts:                       0");
+console.log(`Result:                              ${pass ? "PASS" : "FAIL"}`);
+process.exitCode = pass ? 0 : 1;

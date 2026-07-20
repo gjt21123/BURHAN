@@ -2,7 +2,8 @@ import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { canonicalJson, reduceRun, sha256 } from "@burhan/core";
-import { compileTrustedValidatorPack, qualificationContract, qualificationContractHash, qualificationLintContext, requiredClauseCoverage, trustedCapabilityCompilerVersion, validValidatorBlueprint, verifyTrustedValidatorPack, type ValidatorPackManifest } from "@burhan/validator-compiler";
+import { compileTrustedValidatorPack, qualificationContract, qualificationContractHash, qualificationLintContext, requiredClauseCoverage, trustedCapabilityCompilerVersion, validValidatorBlueprint, verifyTrustedValidatorPack, type BlueprintLintContext, type ValidatorPackManifest } from "@burhan/validator-compiler";
+import type { ValidatorBlueprint } from "@burhan/codex-runner";
 import { qualificationControls, type QualificationControl } from "./control-catalog.js";
 
 export type QualificationStatus = "qualified" | "rejected" | "incomplete";
@@ -25,6 +26,10 @@ export type ValidatorQualificationReport = {
 };
 
 export async function qualifyValidatorPack(): Promise<ValidatorQualificationReport> {
+  return qualifyValidatorPackForBlueprint(validValidatorBlueprint(), qualificationLintContext());
+}
+
+export async function qualifyValidatorPackForBlueprint(blueprint: ValidatorBlueprint, context: BlueprintLintContext): Promise<ValidatorQualificationReport> {
   const stage = await mkdtemp(path.join(os.tmpdir(), "burhan-validator-qualification-"));
   let report: ValidatorQualificationReport;
   try {
@@ -34,10 +39,10 @@ export async function qualifyValidatorPack(): Promise<ValidatorQualificationRepo
     model = reduceRun(model, { type: "VALIDATOR_BLUEPRINT_LINTED" });
     model = reduceRun(model, { type: "VALIDATOR_PACK_COMPILATION_STARTED" });
     const packPath = path.join(stage, "sealed-validator-pack");
-    const compiled = await compileTrustedValidatorPack(packPath, validValidatorBlueprint(), qualificationLintContext());
+    const compiled = await compileTrustedValidatorPack(packPath, blueprint, context);
     model = reduceRun(model, { type: "VALIDATOR_PACK_QUALIFICATION_STARTED" });
     const manifest = await verifyTrustedValidatorPack(packPath);
-    const coverageIntact = requiredClauseCoverage(qualificationContract, manifest, qualificationLintContext().systemCoveredClauseIds);
+    const coverageIntact = requiredClauseCoverage(context.contract, manifest, context.systemCoveredClauseIds);
     const results = await Promise.all(qualificationControls.map((control) => resultForControl(control, manifest)));
     const positiveControls = results.filter((result) => result.expected === "accepted");
     const negativeControls = results.filter((result) => result.expected === "rejected");
@@ -52,7 +57,7 @@ export async function qualifyValidatorPack(): Promise<ValidatorQualificationRepo
     }
     report = {
       schemaVersion: "1",
-      contractHash: qualificationContractHash,
+      contractHash: context.contractHash,
       validatorPackHash: compiled.packHash,
       compilerVersion: trustedCapabilityCompilerVersion,
       compilationStatus: "compiled",
@@ -69,7 +74,7 @@ export async function qualifyValidatorPack(): Promise<ValidatorQualificationRepo
     await writeFile(path.join(stage, "qualification-report.json"), `${canonicalJson(report)}\n`, "utf8");
     return report;
   } catch {
-    report = incompleteReport();
+    report = incompleteReport(context.contractHash);
     await writeFile(path.join(stage, "qualification-report.json"), `${canonicalJson(report)}\n`, "utf8").catch(() => undefined);
     return report;
   } finally {
@@ -114,10 +119,10 @@ function score(results: readonly ControlResult[]): number {
   return results.length === 0 ? 0 : Math.round((results.filter((result) => result.passed).length / results.length) * 100);
 }
 
-function incompleteReport(): ValidatorQualificationReport {
+function incompleteReport(contractHash = qualificationContractHash): ValidatorQualificationReport {
   return {
     schemaVersion: "1",
-    contractHash: qualificationContractHash,
+    contractHash,
     validatorPackHash: null,
     compilerVersion: trustedCapabilityCompilerVersion,
     compilationStatus: "failed",

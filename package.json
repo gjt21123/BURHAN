@@ -16,10 +16,21 @@
     "eval:compiler:fixtures": "npm run eval:fixtures --workspace @burhan/specforge",
     "eval:compiler:live": "npm run eval:live --workspace @burhan/specforge",
     "eval:codex:fixtures": "npm run eval:fixtures --workspace @burhan/codex-runner",
+    "eval:executor:fixtures": "npm run eval:executor:fixtures --workspace @burhan/codex-runner",
+    "eval:execution-verification": "npm run eval:execution-verification --workspace @burhan/codex-runner",
+    "diagnose:codex:live-blueprint": "npm run diagnose:live-blueprint --workspace @burhan/codex-runner",
+    "validate:architect-provider-schema": "npm run validate:architect-provider-schema --workspace @burhan/codex-runner",
+    "eval:architect-output": "npm run eval:architect-output --workspace @burhan/codex-runner",
+    "eval:live-pipeline-continuation": "npm run eval:live-pipeline-continuation --workspace @burhan/codex-runner",
+    "eval:codex:executor:live": "npm run eval:live-executor --workspace @burhan/codex-runner",
+    "eval:codex:executor:finalize": "npm run eval:live-executor-finalize --workspace @burhan/codex-runner",
+    "validate:codex-output-schema": "npm run validate:output-schema --workspace @burhan/codex-runner",
+    "eval:codex:live": "npm run eval:live --workspace @burhan/codex-runner",
     "eval:validator-qualification": "npm run eval --workspace @burhan/validator-qualification",
     "burhan": "npm run burhan --workspace @burhan/cli"
   },
   "devDependencies": {
+    "@openai/codex": "0.144.0",
     "tsx": "^4.19.3"
   },
   "engines": {

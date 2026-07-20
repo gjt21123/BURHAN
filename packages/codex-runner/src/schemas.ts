@@ -27,8 +27,13 @@ export const validatorBlueprintSchema = z.object({
 export const agentExecutionClaimSchema = z.object({
   schemaVersion: z.literal("1"),
   runId: z.string().min(1),
-  status: z.enum(["completed", "failed", "incomplete"]),
+  claimedStatus: z.enum(["completed", "failed", "incomplete"]),
   summary: z.string().min(1),
+  claimedFilesChanged: z.array(relativePathSchema).max(200),
+  claimedTestsRun: z.array(z.string().min(1).max(300)).max(50),
+  claimedConstraintsPreserved: z.array(z.string().min(1).max(300)).max(50),
+  assumptions: z.array(z.string().min(1).max(300)).max(50),
+  limitations: z.array(z.string().min(1).max(300)).max(50),
 }).strict();
 
 export const counterexamplePacketSchema = z.object({
@@ -40,8 +45,9 @@ export const counterexamplePacketSchema = z.object({
 
 export const publicAgentEventSchema = z.object({
   schemaVersion: z.literal("1"),
-  type: z.enum(["status", "claim", "counterexample"]),
+  type: z.enum(["agent_started", "thread_started", "command_started", "command_completed", "file_changed", "agent_message", "agent_completed", "agent_failed"]),
   runId: z.string().min(1),
+  timestamp: z.string().datetime(),
   message: z.string().min(1).max(500),
 }).strict();
 

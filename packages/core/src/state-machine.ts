@@ -3,6 +3,9 @@ import type { RunEvent, RunVerdict } from "./run-events.js";
 export type RunState =
   | "DRAFT"
   | "SEALED"
+  | "PREPARING_VALIDATOR_ARCHITECT"
+  | "RUNNING_VALIDATOR_ARCHITECT"
+  | "VALIDATOR_BLUEPRINT_RECEIVED"
   | "BUILDING_VALIDATOR_BLUEPRINT"
   | "LINTING_VALIDATOR_BLUEPRINT"
   | "COMPILING_VALIDATOR_PACK"
@@ -12,6 +15,16 @@ export type RunState =
   | "VALIDATOR_PACK_INCOMPLETE"
   | "SEALING_VALIDATOR_PACK"
   | "VALIDATOR_PACK_SEALED"
+  | "PREPARING_EXECUTOR"
+  | "RUNNING_EXECUTOR"
+  | "AGENT_CLAIM_RECEIVED"
+  | "CAPTURING_CANDIDATE_PATCH"
+  | "PREPARING_VERIFICATION_WORKSPACE"
+  | "APPLYING_CANDIDATE_PATCH"
+  | "VERIFYING_CANDIDATE"
+  | "VERIFIED"
+  | "REJECTED"
+  | "INCOMPLETE"
   | "PREPARING_WORKSPACE"
   | "VERIFYING_BASELINE"
   | "APPLYING_CANDIDATE"
@@ -29,6 +42,14 @@ export function reduceRun(model: RunModel, event: RunEvent): RunModel {
   switch (event.type) {
     case "CONTRACT_SEALED":
       return model.state === "DRAFT" ? transition("SEALED") : invalid(model, event);
+    case "VALIDATOR_ARCHITECT_PREPARATION_STARTED":
+      return model.state === "SEALED" || model.state === "VALIDATOR_PACK_SEALED" ? transition("PREPARING_VALIDATOR_ARCHITECT") : invalid(model, event);
+    case "VALIDATOR_ARCHITECT_STARTED":
+      return model.state === "PREPARING_VALIDATOR_ARCHITECT" ? transition("RUNNING_VALIDATOR_ARCHITECT") : invalid(model, event);
+    case "VALIDATOR_BLUEPRINT_RECEIVED":
+      return model.state === "RUNNING_VALIDATOR_ARCHITECT" ? transition("VALIDATOR_BLUEPRINT_RECEIVED") : invalid(model, event);
+    case "VALIDATOR_BLUEPRINT_LINT_STARTED":
+      return model.state === "VALIDATOR_BLUEPRINT_RECEIVED" ? transition("LINTING_VALIDATOR_BLUEPRINT") : invalid(model, event);
     case "VALIDATOR_BLUEPRINT_BUILD_STARTED":
       return model.state === "SEALED" ? transition("BUILDING_VALIDATOR_BLUEPRINT") : invalid(model, event);
     case "VALIDATOR_BLUEPRINT_READY":
@@ -49,6 +70,26 @@ export function reduceRun(model: RunModel, event: RunEvent): RunModel {
       return model.state === "VALIDATOR_PACK_QUALIFIED" ? transition("SEALING_VALIDATOR_PACK") : invalid(model, event);
     case "VALIDATOR_PACK_SEALED":
       return model.state === "SEALING_VALIDATOR_PACK" ? transition("VALIDATOR_PACK_SEALED") : invalid(model, event);
+    case "EXECUTOR_PREPARATION_STARTED":
+      return model.state === "VALIDATOR_PACK_SEALED" ? transition("PREPARING_EXECUTOR") : invalid(model, event);
+    case "EXECUTOR_STARTED":
+      return model.state === "PREPARING_EXECUTOR" ? transition("RUNNING_EXECUTOR") : invalid(model, event);
+    case "AGENT_CLAIM_RECEIVED":
+      return model.state === "RUNNING_EXECUTOR" ? transition("AGENT_CLAIM_RECEIVED") : invalid(model, event);
+    case "CANDIDATE_PATCH_CAPTURE_STARTED":
+      return model.state === "AGENT_CLAIM_RECEIVED" ? transition("CAPTURING_CANDIDATE_PATCH") : invalid(model, event);
+    case "VERIFICATION_WORKSPACE_PREPARATION_STARTED":
+      return model.state === "CAPTURING_CANDIDATE_PATCH" ? transition("PREPARING_VERIFICATION_WORKSPACE") : invalid(model, event);
+    case "CANDIDATE_PATCH_APPLICATION_STARTED":
+      return model.state === "PREPARING_VERIFICATION_WORKSPACE" ? transition("APPLYING_CANDIDATE_PATCH") : invalid(model, event);
+    case "CANDIDATE_VERIFICATION_STARTED":
+      return model.state === "APPLYING_CANDIDATE_PATCH" ? transition("VERIFYING_CANDIDATE") : invalid(model, event);
+    case "CANDIDATE_VERIFIED":
+      return model.state === "VERIFYING_CANDIDATE" ? transition("VERIFIED", "verified") : invalid(model, event);
+    case "CANDIDATE_REJECTED":
+      return model.state === "VERIFYING_CANDIDATE" ? transition("REJECTED", "rejected") : invalid(model, event);
+    case "CANDIDATE_INCOMPLETE":
+      return model.state === "VERIFYING_CANDIDATE" ? transition("INCOMPLETE", "incomplete") : invalid(model, event);
     case "WORKSPACE_PREPARATION_STARTED":
       return model.state === "SEALED" || model.state === "VALIDATOR_PACK_SEALED" ? transition("PREPARING_WORKSPACE") : invalid(model, event);
     case "WORKSPACE_CREATED":

@@ -25,3 +25,7 @@ SpecForge treats both repository facts and task text as untrusted data to reduce
 ## Validator blueprint threats
 
 An untrusted blueprint may try to embed a command, executable, environment reference, absolute path, control oracle, evidence record, receipt, verdict, arbitrary source, or a weak assertion. The deterministic blueprint linter rejects these fields recursively, validates contract and baseline hashes, limits capability parameters, and reserves invariants and prohibitions for BURHAN-owned validators. Qualification prevents a pack that only passes a baseline or one preferred correct strategy from being sealed; file hashing detects any post-compilation pack mutation.
+
+## Codex executor threats
+
+Codex authentication remains local to the CLI and is never copied into BURHAN. The worker exposes capped JSONL-derived public events only and redacts token-like text, home paths, validator locations, and protected paths. Executor evidence and completion claims are untrusted. A captured patch is applied only to a fresh workspace; forbidden changes, test changes, manifest changes, untracked files, and post-verification pack mutation are independently checked.

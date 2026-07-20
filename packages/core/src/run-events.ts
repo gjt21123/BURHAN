@@ -2,6 +2,10 @@ export type RunVerdict = "verified" | "rejected" | "incomplete";
 
 export type RunEvent =
   | { type: "CONTRACT_SEALED" }
+  | { type: "VALIDATOR_ARCHITECT_PREPARATION_STARTED" }
+  | { type: "VALIDATOR_ARCHITECT_STARTED" }
+  | { type: "VALIDATOR_BLUEPRINT_RECEIVED" }
+  | { type: "VALIDATOR_BLUEPRINT_LINT_STARTED" }
   | { type: "VALIDATOR_BLUEPRINT_BUILD_STARTED" }
   | { type: "VALIDATOR_BLUEPRINT_READY" }
   | { type: "VALIDATOR_BLUEPRINT_LINTED" }
@@ -12,6 +16,16 @@ export type RunEvent =
   | { type: "VALIDATOR_PACK_INCOMPLETE" }
   | { type: "VALIDATOR_PACK_SEALING_STARTED" }
   | { type: "VALIDATOR_PACK_SEALED" }
+  | { type: "EXECUTOR_PREPARATION_STARTED" }
+  | { type: "EXECUTOR_STARTED" }
+  | { type: "AGENT_CLAIM_RECEIVED" }
+  | { type: "CANDIDATE_PATCH_CAPTURE_STARTED" }
+  | { type: "VERIFICATION_WORKSPACE_PREPARATION_STARTED" }
+  | { type: "CANDIDATE_PATCH_APPLICATION_STARTED" }
+  | { type: "CANDIDATE_VERIFICATION_STARTED" }
+  | { type: "CANDIDATE_VERIFIED" }
+  | { type: "CANDIDATE_REJECTED" }
+  | { type: "CANDIDATE_INCOMPLETE" }
   | { type: "WORKSPACE_PREPARATION_STARTED" }
   | { type: "WORKSPACE_CREATED"; workspaceId: string }
   | { type: "BASELINE_VERIFIED" }

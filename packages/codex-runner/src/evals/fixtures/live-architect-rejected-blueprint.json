@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1",
+  "contractHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "repositoryBaselineHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "subject": { "modulePath": "src/payment-service.ts", "exportName": "PaymentService" },
+  "validators": [
+    { "id": "same-key", "clauseId": "same-key-concurrency", "capabilityId": "payment.same_key_concurrency", "subject": { "modulePath": "src/payment-service.ts", "exportName": "PaymentService" }, "parameters": { "requestCount": 20, "expectedCharges": 1, "key": "same-key", "amount": 100 }, "expectedObservation": "One charge is created for concurrent same-key requests.", "rationale": "Deterministic payment outcome." },
+    { "id": "distinct-key", "clauseId": "distinct-key-independence", "capabilityId": "payment.distinct_key_independence", "subject": { "modulePath": "src/payment-service.ts", "exportName": "PaymentService" }, "parameters": { "keyCount": 2, "expectedCharges": 2, "keys": ["one", "two"], "amount": 100 }, "expectedObservation": "Distinct keys create independent charges.", "rationale": "Deterministic payment outcome." },
+    { "id": "documentation", "clauseId": "idempotency-header-documentation", "capabilityId": "docs.idempotency_header_present", "subject": { "modulePath": "src/payment-service.ts", "exportName": "PaymentService" }, "parameters": { "documentationPath": "docs/api.md", "requiredTerms": ["Idempotency-Key", "POST /payments"] }, "expectedObservation": "Documentation names the required header.", "rationale": "Deterministic documentation outcome." }
+  ],
+  "uncoveredClauses": [],
+  "assumptions": []
+}
