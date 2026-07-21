@@ -32,7 +32,20 @@ export type RunState =
   | "EVALUATING"
   | "ISSUING_RECEIPT"
   | "COMPLETED"
-  | "FAILED";
+  | "FAILED"
+  | "BUILDING_COUNTEREXAMPLE"
+  | "COUNTEREXAMPLE_READY"
+  | "AWAITING_REPAIR_APPROVAL"
+  | "REPAIR_APPROVED"
+  | "REPAIR_DECLINED"
+  | "RESUMING_EXECUTOR"
+  | "REPAIRING"
+  | "CAPTURING_REPAIR_PATCH"
+  | "PREPARING_REPAIR_VERIFICATION"
+  | "REVERIFYING_REPAIR"
+  | "REPAIR_VERIFIED"
+  | "REPAIR_REJECTED"
+  | "REPAIR_INCOMPLETE";
 
 export type RunModel = { state: RunState; verdict?: RunVerdict };
 
@@ -106,6 +119,34 @@ export function reduceRun(model: RunModel, event: RunEvent): RunModel {
       return model.state === "RUNNING_VALIDATORS" ? transition("EVALUATING", event.verdict) : invalid(model, event);
     case "RECEIPT_ISSUED":
       return model.state === "EVALUATING" ? transition("COMPLETED", model.verdict) : invalid(model, event);
+    case "COUNTEREXAMPLE_BUILDING":
+      return model.state === "REJECTED" ? transition("BUILDING_COUNTEREXAMPLE") : invalid(model, event);
+    case "COUNTEREXAMPLE_READY":
+      return model.state === "BUILDING_COUNTEREXAMPLE" ? transition("COUNTEREXAMPLE_READY") : invalid(model, event);
+    case "REPAIR_APPROVAL_AWAITING":
+      return model.state === "COUNTEREXAMPLE_READY" ? transition("AWAITING_REPAIR_APPROVAL") : invalid(model, event);
+    case "REPAIR_APPROVED":
+      return model.state === "AWAITING_REPAIR_APPROVAL" ? transition("REPAIR_APPROVED") : invalid(model, event);
+    case "REPAIR_DECLINED":
+      return model.state === "AWAITING_REPAIR_APPROVAL" ? transition("REPAIR_DECLINED") : invalid(model, event);
+    case "EXECUTOR_RESUME_STARTED":
+      return model.state === "REPAIR_APPROVED" ? transition("RESUMING_EXECUTOR") : invalid(model, event);
+    case "REPAIR_STARTED":
+      return model.state === "RESUMING_EXECUTOR" ? transition("REPAIRING") : invalid(model, event);
+    case "REPAIR_PATCH_CAPTURE_STARTED":
+      return model.state === "REPAIRING" ? transition("CAPTURING_REPAIR_PATCH") : invalid(model, event);
+    case "REPAIR_VERIFICATION_PREPARATION_STARTED":
+      return model.state === "CAPTURING_REPAIR_PATCH" ? transition("PREPARING_REPAIR_VERIFICATION") : invalid(model, event);
+    case "REPAIR_VERIFICATION_STARTED":
+      return model.state === "PREPARING_REPAIR_VERIFICATION" ? transition("REVERIFYING_REPAIR") : invalid(model, event);
+    case "REPAIR_VERIFIED":
+      return model.state === "REVERIFYING_REPAIR" ? transition("REPAIR_VERIFIED", "verified") : invalid(model, event);
+    case "REPAIR_REJECTED":
+      return model.state === "REVERIFYING_REPAIR" ? transition("REPAIR_REJECTED", "rejected") : invalid(model, event);
+    case "REPAIR_INCOMPLETE":
+      return model.state === "REVERIFYING_REPAIR" || model.state === "RESUMING_EXECUTOR" ? transition("REPAIR_INCOMPLETE", "incomplete") : invalid(model, event);
+    case "REPAIR_RECEIPT_ISSUED":
+      return ["REPAIR_VERIFIED", "REPAIR_REJECTED", "REPAIR_INCOMPLETE"].includes(model.state) ? transition("COMPLETED", model.verdict) : invalid(model, event);
     case "RUN_FAILED":
       return transition("FAILED", "incomplete");
   }

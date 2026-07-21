@@ -35,4 +35,18 @@ export type RunEvent =
   | { type: "VALIDATOR_COMPLETED"; validatorId: string }
   | { type: "VERDICT_ISSUED"; verdict: RunVerdict }
   | { type: "RECEIPT_ISSUED"; receiptId: string }
+  | { type: "COUNTEREXAMPLE_BUILDING" }
+  | { type: "COUNTEREXAMPLE_READY" }
+  | { type: "REPAIR_APPROVAL_AWAITING" }
+  | { type: "REPAIR_APPROVED" }
+  | { type: "REPAIR_DECLINED" }
+  | { type: "EXECUTOR_RESUME_STARTED" }
+  | { type: "REPAIR_STARTED" }
+  | { type: "REPAIR_PATCH_CAPTURE_STARTED" }
+  | { type: "REPAIR_VERIFICATION_PREPARATION_STARTED" }
+  | { type: "REPAIR_VERIFICATION_STARTED" }
+  | { type: "REPAIR_VERIFIED" }
+  | { type: "REPAIR_REJECTED" }
+  | { type: "REPAIR_INCOMPLETE" }
+  | { type: "REPAIR_RECEIPT_ISSUED"; receiptId: string }
   | { type: "RUN_FAILED"; reason: string };

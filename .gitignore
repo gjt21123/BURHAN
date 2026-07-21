@@ -2,7 +2,9 @@ node_modules/
 .next/
 dist/
 coverage/
+build.log
 *.tsbuildinfo
 .burhan/
+.burhan-demo/
 .env*
 !.env.example

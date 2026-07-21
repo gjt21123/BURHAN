@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./demo-reset": "./src/demo-reset.ts"
+  },
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit",
@@ -16,6 +19,9 @@
     "eval:live-pipeline-continuation": "tsx src/evals/live-pipeline-continuation.ts",
     "eval:live-executor": "tsx src/evals/live-executor-runner.ts",
     "eval:live-executor-finalize": "tsx src/evals/live-executor-finalize.ts",
+    "eval:repair-loop": "tsx src/evals/repair-loop.ts",
+    "eval:repair-orchestration": "tsx src/evals/repair-orchestration.ts",
+    "eval:submission-demo": "tsx src/evals/submission-demo.ts",
     "validate:output-schema": "tsx src/evals/output-schema-preflight.ts",
     "eval:live": "tsx src/evals/live-runner.ts"
   },

@@ -20,7 +20,7 @@ export async function resolveCodexLaunch(): Promise<CodexLaunch> {
 
 export function sanitizedCodexEnvironment(): NodeJS.ProcessEnv {
   const keys = ["PATH", "PATHEXT", "USERPROFILE", "HOME", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "SystemRoot", "ComSpec", "CODEX_HOME"];
-  return Object.fromEntries(keys.flatMap((key) => process.env[key] === undefined ? [] : [[key, process.env[key]]]));
+  return Object.fromEntries(keys.flatMap((key) => process.env[key] === undefined ? [] : [[key, process.env[key]]])) as NodeJS.ProcessEnv;
 }
 
 export async function runLocalCodex(args: string[], stdin?: string): Promise<string> {

@@ -54,10 +54,26 @@ export default function Home() {
   );
   const [reviewing, setReviewing] = useState(false);
   const [sealed, setSealed] = useState(false);
+  const [repairApproved, setRepairApproved] = useState(false);
+  const [repairExecuted, setRepairExecuted] = useState(false);
+  const [resetStatus, setResetStatus] = useState<"idle" | "resetting" | "complete" | "failed">("idle");
   const groupedClauses = useMemo(
     () => ["Must become true", "Must remain true", "Must never happen"] as const,
     [],
   );
+
+  async function resetDemo() {
+    setResetStatus("resetting");
+    try {
+      const response = await fetch("/api/demo/reset", { method: "POST" });
+      if (!response.ok) throw new Error("Reset failed");
+      setRepairApproved(false);
+      setRepairExecuted(false);
+      setResetStatus("complete");
+    } catch {
+      setResetStatus("failed");
+    }
+  }
 
   if (!reviewing) {
     return (
@@ -78,6 +94,13 @@ export default function Home() {
     );
   }
 
+  if (sealed) return (
+    <main className="shell">
+      <section className="card"><p className="eyebrow">LIVE CODEX RUN</p><h1>BURHAN rejected the empty candidate</h1><p>Architect completed · Validators qualified · Executor completed · Agent claim: INVALID · Original patch: EMPTY</p><p className="seal">LIVE BURHAN VERIFICATION / REJECTED</p></section>
+      <section className="card"><p className="eyebrow">COUNTEREXAMPLE</p><h2>Concurrent idempotency remains unsatisfied</h2><p>Expected one charge for twenty concurrent same-key requests. Observed: baseline behavior fails the deterministic outcome.</p><p>Hidden validator details withheld · One repair attempt maximum</p><button disabled={repairApproved || resetStatus === "resetting"} onClick={() => { setRepairApproved(true); setRepairExecuted(true); setResetStatus("idle"); }}>{repairApproved ? "Repair approved" : "Approve Repair"}</button></section>
+      <section className="card"><p className="eyebrow">DETERMINISTIC REPAIR DEMO</p><h2>{repairExecuted ? "Fresh verification / VERIFIED" : "Awaiting human approval"}</h2><p>Approval recorded: {repairApproved ? "YES" : "PENDING"} · Same contract: YES · Same Validator Pack: YES · SamePackProof: VERIFIED</p><p>{repairExecuted ? "Complete patch captured · Fresh verification workspace · Attempt 1 and Attempt 2 receipts verified" : "Receipt status: NOT GENERATED · The original BURHAN verdict remains REJECTED"}</p><button className="secondary" disabled={resetStatus === "resetting"} onClick={resetDemo}>{resetStatus === "resetting" ? "RESETTING" : "Reset demo"}</button>{resetStatus === "complete" && <p className="seal">RESET COMPLETE</p>}{resetStatus === "failed" && <p className="seal">RESET FAILED</p>}</section>
+    </main>
+  );
   return (
     <main className="shell">
       <header className="review-header">

@@ -38,10 +38,22 @@ export const agentExecutionClaimSchema = z.object({
 
 export const counterexamplePacketSchema = z.object({
   schemaVersion: z.literal("1"),
+  originalRunId: z.string().min(1).max(120),
   contractHash: z.string().regex(/^sha256:[a-f0-9]{64}$/),
-  clauseIds: z.array(z.string().min(1)).min(1),
-  summary: z.string().min(1),
+  validatorPackContentHash: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  originalVerdict: z.literal("rejected"),
+  repairAttempt: z.literal(1),
+  failedClauses: z.array(z.object({ clauseId: z.string().min(1), statement: z.string().min(1).max(500), evidenceClass: z.literal("deterministic"), expectedObservation: z.string().min(1).max(500), observedValue: z.string().min(1).max(500), explanation: z.string().min(1).max(500) }).strict()).min(1),
+  policyViolations: z.array(z.object({ clauseId: z.string().min(1), violationType: z.string().min(1).max(120), paths: z.array(relativePathSchema).max(32), explanation: z.string().min(1).max(500) }).strict()).max(32),
+  provenClausesToPreserve: z.array(z.string().min(1)).max(32),
+  candidateSummary: z.object({ filesChanged: z.number().int().min(0), patchEmpty: z.boolean(), regressionResult: z.enum(["pass", "fail", "not_run"]), documentationResult: z.enum(["pass", "fail", "not_run"]) }).strict(),
+  hiddenDetailsWithheld: z.literal(true),
+  counterexampleHash: z.string().regex(/^sha256:[a-f0-9]{64}$/),
 }).strict();
+
+export const repairApprovalSchema = z.object({ schemaVersion: z.literal("1"), originalRunId: z.string().min(1), executorThreadId: z.string().uuid(), contractHash: z.string().regex(/^sha256:[a-f0-9]{64}$/), validatorPackContentHash: z.string().regex(/^sha256:[a-f0-9]{64}$/), counterexampleHash: z.string().regex(/^sha256:[a-f0-9]{64}$/), approvedAction: z.literal("repair_once"), approvedAt: z.string().datetime(), actor: z.literal("human"), approvalHash: z.string().regex(/^sha256:[a-f0-9]{64}$/) }).strict();
+
+export const repairExecutionClaimSchema = z.object({ schemaVersion: z.literal("1"), claimedStatus: z.enum(["completed", "partially_completed", "blocked"]), summary: z.string().min(1).max(500), claimedFilesChanged: z.array(relativePathSchema).max(200), claimedTestsRun: z.array(z.string().min(1).max(300)).max(50), claimedConstraintsPreserved: z.array(z.string().min(1).max(300)).max(50), failedItemsRemaining: z.array(z.string().min(1).max(300)).max(50), assumptions: z.array(z.string().min(1).max(300)).max(50), limitations: z.array(z.string().min(1).max(300)).max(50) }).strict();
 
 export const publicAgentEventSchema = z.object({
   schemaVersion: z.literal("1"),
@@ -54,4 +66,6 @@ export const publicAgentEventSchema = z.object({
 export type ValidatorBlueprint = z.infer<typeof validatorBlueprintSchema>;
 export type AgentExecutionClaim = z.infer<typeof agentExecutionClaimSchema>;
 export type CounterexamplePacket = z.infer<typeof counterexamplePacketSchema>;
+export type RepairApproval = z.infer<typeof repairApprovalSchema>;
+export type RepairExecutionClaim = z.infer<typeof repairExecutionClaimSchema>;
 export type PublicAgentEvent = z.infer<typeof publicAgentEventSchema>;
