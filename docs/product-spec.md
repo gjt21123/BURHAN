@@ -42,6 +42,7 @@ Codex can act as a separate executor, but its `AgentExecutionClaim` cannot issue
 
 ## Explicit non-goals
 
-- No model integrations or external agent execution yet.
+- No claim that an agent completion message, a structured output, or a local signature alone proves correctness.
 - No GitHub authentication, multi-tenancy, Kubernetes, or blockchain.
 - No claim of mathematical correctness for arbitrary programs.
+- No claim of hostile-code containment beyond the documented `local_trusted` execution assurance.

@@ -1,0 +1,32 @@
+1
+00:00:00,000 --> 00:00:15,000
+Coding agents can say they are done, but that is not proof.
+BURHAN turns a bounded task into independent evidence.
+
+2
+00:00:15,000 --> 00:00:35,000
+The task becomes a sealed contract and a qualified validator pack.
+
+3
+00:00:35,000 --> 00:01:05,000
+Historical live Codex Architect and Executor evidence is separate from the verdict.
+
+4
+00:01:05,000 --> 00:01:30,000
+BURHAN captured an empty patch and independently issued REJECTED.
+
+5
+00:01:30,000 --> 00:01:50,000
+A sanitized counterexample requires human approval for one bounded repair.
+
+6
+00:01:50,000 --> 00:02:25,000
+DETERMINISTIC REPAIR DEMO: same validator standard and fresh verification.
+
+7
+00:02:25,000 --> 00:02:45,000
+VERIFIED with SamePackProof and linked local-artifact-integrity receipts.
+
+8
+00:02:45,000 --> 00:03:00,000
+Agents should not merely say they finished. They should prove it.

@@ -28,3 +28,16 @@
 - Codex added shared structured agent schemas and fixture-only ValidatorBlueprint intake; no live Codex request is made.
 - Codex added a deterministic blueprint linter, trusted capability templates, manifest hashing, sealing, qualification controls, and a copied-pack tamper probe.
 - Codex added the qualification reducer states and a read-only result component. Human product decisions retained: model-authored commands and arbitrary test code are forbidden, control catalog paths remain internal, and qualification precedes pack sealing.
+
+## Milestone 4B and 4C
+
+- Codex was used in one real Architect and Executor flow. BURHAN received lifecycle events, captured the actual candidate patch, and independently verified the candidate in a fresh workspace.
+- The real candidate patch was empty. BURHAN therefore returned `REJECTED`; an agent completion claim did not affect the verdict.
+- Codex implemented the deterministic retained repair demonstration, SamePackProof, linked local artifact-integrity receipts, tampering checks, and the safe demo reset. The repair shown in the submission UI is deterministic and reproducible; it is not presented as a second live Codex repair.
+- The historical live run predates complete retained-run bundles, so same-thread live repair is accurately unavailable as `REPAIR_CONTEXT_UNAVAILABLE`.
+
+## AI disclosure for submission
+
+- Codex contributed implementation assistance and was used for the recorded live Architect/Executor evidence.
+- GPT-5.6 is supported server-side by the SpecForge compiler boundary through Structured Outputs. The project does not claim a successful live GPT-5.6 result for the final submission because the live API evaluation was unavailable due to quota.
+- All final verdicts in the demo come from BURHAN-owned deterministic verification, not from an AI model's self-report.
