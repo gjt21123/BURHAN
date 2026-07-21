@@ -61,6 +61,7 @@ export default function Home() {
     () => ["Must become true", "Must remain true", "Must never happen"] as const,
     [],
   );
+  const resetting = resetStatus === "resetting";
 
   async function resetDemo() {
     setResetStatus("resetting");
@@ -75,9 +76,16 @@ export default function Home() {
     }
   }
 
+  function approveRepair() {
+    setRepairApproved(true);
+    setRepairExecuted(true);
+    setResetStatus("idle");
+  }
+
   if (!reviewing) {
     return (
       <main className="shell">
+        <p className="product-mark">BURHAN <span>PROOF-CARRYING WORK</span></p>
         <section className="hero">
           <p className="eyebrow">BURHAN / DEFINE</p>
           <h1>Agents don’t say done.<br />They prove it.</h1>
@@ -95,14 +103,40 @@ export default function Home() {
   }
 
   if (sealed) return (
-    <main className="shell">
-      <section className="card"><p className="eyebrow">LIVE CODEX RUN</p><h1>BURHAN rejected the empty candidate</h1><p>Architect completed · Validators qualified · Executor completed · Agent claim: INVALID · Original patch: EMPTY</p><p className="seal">LIVE BURHAN VERIFICATION / REJECTED</p></section>
-      <section className="card"><p className="eyebrow">COUNTEREXAMPLE</p><h2>Concurrent idempotency remains unsatisfied</h2><p>Expected one charge for twenty concurrent same-key requests. Observed: baseline behavior fails the deterministic outcome.</p><p>Hidden validator details withheld · One repair attempt maximum</p><button disabled={repairApproved || resetStatus === "resetting"} onClick={() => { setRepairApproved(true); setRepairExecuted(true); setResetStatus("idle"); }}>{repairApproved ? "Repair approved" : "Approve Repair"}</button></section>
-      <section className="card"><p className="eyebrow">DETERMINISTIC REPAIR DEMO</p><h2>{repairExecuted ? "Fresh verification / VERIFIED" : "Awaiting human approval"}</h2><p>Approval recorded: {repairApproved ? "YES" : "PENDING"} · Same contract: YES · Same Validator Pack: YES · SamePackProof: VERIFIED</p><p>{repairExecuted ? "Complete patch captured · Fresh verification workspace · Attempt 1 and Attempt 2 receipts verified" : "Receipt status: NOT GENERATED · The original BURHAN verdict remains REJECTED"}</p><button className="secondary" disabled={resetStatus === "resetting"} onClick={resetDemo}>{resetStatus === "resetting" ? "RESETTING" : "Reset demo"}</button>{resetStatus === "complete" && <p className="seal">RESET COMPLETE</p>}{resetStatus === "failed" && <p className="seal">RESET FAILED</p>}</section>
+    <main className="shell demo-shell">
+      <header className="demo-header">
+        <div>
+          <p className="product-mark">BURHAN <span>SUBMISSION REPLAY</span></p>
+          <h1>One claim. Independent proof.</h1>
+          <p>Live execution is historical evidence. Repair below is an explicitly deterministic demonstration.</p>
+        </div>
+        <div className="mode-legend" aria-label="Demo modes"><span className="mode live">LIVE EVIDENCE</span><span className="mode deterministic">DETERMINISTIC DEMO</span></div>
+      </header>
+      <ol className="demo-progress" aria-label="Proof flow">
+        <li className="complete">Live run</li><li className="complete">Rejected</li><li className="complete">Counterexample</li><li className={repairApproved ? "complete" : "active"}>Approve repair</li><li className={repairExecuted ? "complete" : "pending"}>Fresh verification</li><li className={repairExecuted ? "complete" : "pending"}>Linked receipts</li>
+      </ol>
+      <section className="demo-flow">
+        <article className="stage-card live-stage">
+          <div className="stage-number">01</div>
+          <div className="stage-copy"><p className="eyebrow">LIVE CODEX RUN</p><h2>BURHAN rejected the empty candidate</h2><p>Architect completed, validators qualified, and the Executor completed. BURHAN captured an empty patch and issued the verdict.</p><div className="evidence-row"><span>Agent claim: INVALID</span><span>Patch: EMPTY</span><span>Fresh verification: COMPLETE</span></div></div>
+          <p className="verdict rejected">LIVE BURHAN VERIFICATION <strong>REJECTED</strong></p>
+        </article>
+        <article className="stage-card counterexample-stage">
+          <div className="stage-number">02</div>
+          <div className="stage-copy"><p className="eyebrow">SANITIZED COUNTEREXAMPLE</p><h2>Concurrent idempotency remains unsatisfied</h2><p>Expected one charge for twenty concurrent requests using the same key. The deterministic outcome still fails.</p><p className="stage-note">Validator source is withheld · One repair attempt maximum · Human approval required</p></div>
+          <button disabled={repairApproved || resetting} onClick={approveRepair}>{repairApproved ? "REPAIR APPROVED" : "APPROVE REPAIR"}</button>
+        </article>
+        <article className="stage-card repair-stage">
+          <div className="stage-number">03</div>
+          <div className="stage-copy"><p className="eyebrow">DETERMINISTIC REPAIR DEMO</p><h2>{repairExecuted ? "Fresh verification completed" : "Awaiting human approval"}</h2><p>{repairExecuted ? "The deterministic repair is verified in a fresh workspace with the same contract and validator pack." : "The original rejection remains authoritative until a human approves the deterministic repair demo."}</p><div className="evidence-row"><span>Approval: {repairApproved ? "RECORDED" : "PENDING"}</span><span>SamePackProof: VERIFIED</span><span>Receipts: {repairExecuted ? "LINKED" : "NOT GENERATED"}</span></div></div>
+          <div className="repair-actions"><p className={repairExecuted ? "verdict verified" : "verdict pending"}>{repairExecuted ? "FRESH VERIFICATION / VERIFIED" : "ORIGINAL VERDICT / REJECTED"}</p><button className="secondary" disabled={resetting} onClick={resetDemo}>{resetting ? "RESETTING" : "RESET DEMO"}</button><p className="reset-message" aria-live="polite">{resetStatus === "complete" ? "RESET COMPLETE · Back to the original rejected state" : resetStatus === "failed" ? "RESET FAILED · Original evidence remains unchanged" : ""}</p></div>
+        </article>
+      </section>
     </main>
   );
   return (
     <main className="shell">
+      <p className="product-mark">BURHAN <span>PROOF-CARRYING WORK</span></p>
       <header className="review-header">
         <div>
           <p className="eyebrow">BURHAN / REVIEW</p>
