@@ -46,7 +46,7 @@ Live Codex Architect/Executor evidence is historical and real. The repair demo i
 
 ## URLs and identifier placeholders
 
-- Repository: `REPOSITORY_URL`
+- Repository: `https://github.com/gjt21123/BURHAN`
 - Demo: `DEMO_URL`
 - Video: `VIDEO_URL`
 - Devpost submission: `DEVPOST_SUBMISSION_URL`
