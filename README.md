@@ -74,9 +74,9 @@ BURHAN distinguishes deterministic evidence, provider-backed execution, local ar
 
 ## Project status
 
-BURHAN is **early-stage open source (0.1.x)**.
+BURHAN is **early-stage open source (0.2.x)**.
 
-The current full reference verification path is Windows-native. Unit tests, type checks, and the web build are exercised across Windows, Linux, and macOS in CI. Cross-platform equivalence for the complete verification path is a roadmap item.
+The current full reference verification path is Windows-native. Unit tests, type checks, and the web build are exercised across Windows, Linux, and macOS in CI on Node.js 20 and 22. Cross-platform equivalence for the complete verification path is a roadmap item.
 
 Current assurance boundaries are documented in [the threat model](docs/threat-model.md). In particular, `local_trusted` is **not** a hardened sandbox, external attestation mechanism, malware-containment boundary, or mathematical proof system.
 
@@ -84,7 +84,7 @@ Current assurance boundaries are documented in [the threat model](docs/threat-mo
 
 Requirements:
 
-- Node.js 20+
+- Node.js 20.9+
 - npm
 - Git
 
@@ -235,7 +235,7 @@ BURHAN is maintained as a public OSS project, not merely as a code snapshot.
 
 GitHub Actions provide:
 
-- multi-platform unit/type/build checks;
+- multi-platform unit/type/build checks on Node.js 20 and 22;
 - the Windows-native full deterministic verification suite;
 - production dependency auditing;
 - CodeQL scanning;
