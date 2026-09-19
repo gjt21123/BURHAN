@@ -1,165 +1,290 @@
 # BURHAN
 
-> **Agents should not merely say they finished. They should prove it.**
+[![CI](https://github.com/gjt21123/BURHAN/actions/workflows/ci.yml/badge.svg)](https://github.com/gjt21123/BURHAN/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/gjt21123/BURHAN/actions/workflows/codeql.yml/badge.svg)](https://github.com/gjt21123/BURHAN/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/gjt21123/BURHAN/badge)](https://securityscorecards.dev/viewer/?uri=github.com/gjt21123/BURHAN)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-BURHAN is an independent verification plane that turns a bounded coding task into sealed, reproducible evidence before it accepts or rejects an agent's work.
+> **Coding agents should not merely say they finished. They should prove it.**
 
-## The problem
+BURHAN is an open-source, evidence-first verification plane for bounded coding-agent work. It separates **who performs a coding task** from **who decides whether the task is actually complete**.
 
-An agent's “done” message, test summary, or structured completion claim is not independently trustworthy. A coding task needs explicit requirements, protected boundaries, and verification that the agent cannot author.
+A model, coding agent, or executor can propose code, tests, explanations, and completion claims. BURHAN treats those claims as untrusted input, captures the candidate state, applies a sealed and qualified validator pack, verifies in a fresh workspace, and reduces the resulting evidence into an explicit verdict.
 
-## What BURHAN does
+## Why BURHAN exists
 
-1. Compiles and human-seals a bounded `ProofContract`.
-2. Qualifies a deterministic validator pack against positive and negative controls.
-3. Captures candidate state, verifies it in a fresh workspace, and issues the verdict from BURHAN-owned evidence.
-4. Preserves local artifact integrity with canonical hashes and linked receipts.
+Agentic coding creates a new acceptance problem:
 
-## Demo story
+- the same agent can change code and tests;
+- a passing self-reported test summary is not independent evidence;
+- requirements can be partially satisfied while the agent still reports success;
+- protected files can be changed unless boundaries are explicit;
+- provider output can look authoritative even when it is incomplete or wrong.
 
-The payment-idempotency demo requires exactly one charge from twenty concurrent same-key requests, keeps distinct keys independent, documents the API header, and protects migrations, tests, and dependency manifests.
+BURHAN adds an independent verification boundary around a bounded task.
 
-- A real **live Codex Validator Architect** proposed a strategy that BURHAN validated and qualified.
-- A separate real **live Codex Executor** ran. BURHAN captured its empty candidate patch and independently issued **REJECTED** in a fresh workspace.
-- The original live run cannot support same-thread repair because its complete retained bundle did not yet exist. BURHAN reports `REPAIR_CONTEXT_UNAVAILABLE`.
-- The UI repair sequence is a clearly labeled **DETERMINISTIC REPAIR DEMO**. It uses the same sealed validator standard, `SamePackProof`, fresh verification, linked local-artifact-integrity receipts, and tampering detection to produce deterministic **VERIFIED** evidence.
-
-## Architecture
-
-```mermaid
-flowchart LR
-  U[User task] --> CC[Contract compiler]
-  CC --> HS[Human seal]
-  HS --> VB[Untrusted ValidatorBlueprint]
-  VB --> DC[Deterministic compiler]
-  DC --> QG[Qualification gate]
-  QG --> VP[Sealed validator pack]
-  VP --> EX[Separate Executor]
-  EX --> PC[Parent-owned patch capture]
-  PC --> FV[Fresh verification]
-  FV --> V[BURHAN verdict]
-  V --> CE[Sanitized counterexample]
-  CE --> HA[Human approval]
-  HA --> DR[Deterministic repair demo]
-  DR --> LR[Linked receipts]
+```text
+requirement
+   |
+   v
+ProofContract --human seal--> ValidatorBlueprint
+                                |
+                                v
+                       deterministic compiler
+                                |
+                                v
+                      qualification controls
+                                |
+                                v
+                       sealed validator pack
+                                |
+coding agent --> candidate state capture
+                                |
+                                v
+                        fresh verification
+                                |
+                                v
+                          evidence chain
+                                |
+                                v
+                             verdict
 ```
 
-See [docs/architecture.md](docs/architecture.md) and [docs/threat-model.md](docs/threat-model.md).
+## Core properties
 
-## Trust boundaries
+### Evidence over self-report
 
-- **Untrusted:** model drafts, ValidatorBlueprints, Codex output, `AgentExecutionClaim`, and candidate patch.
-- **Deterministic BURHAN components:** filtering, linting, trusted templates, qualification, sealing, patch capture, fresh verification, and verdict reduction.
-- **Protected artifacts:** sealed contracts, validator packs, qualification reports, evidence, and receipt-chain hashes.
-- **Execution:** `local_trusted` is local independent execution assurance—not a secure sandbox, complete network isolation, malicious-code containment, or a mathematical correctness guarantee.
+Agent completion messages and `AgentExecutionClaim` objects do not determine acceptance. BURHAN-owned evidence does.
 
-## Live versus deterministic disclosure
+### Qualified validators
 
-| Label | Truthful meaning |
-| --- | --- |
-| **LIVE CODEX RUN** | Historical evidence from real Codex Architect and Executor runs. |
-| **LIVE BURHAN VERIFICATION** | BURHAN captured the candidate state and returned `REJECTED`. |
-| **DETERMINISTIC REPAIR DEMO** | A reproducible local proof demonstration, not a second live Codex repair. |
-| **local artifact integrity** | Local Ed25519 integrity only; not external attestation or certification. |
+A validator strategy is not trusted merely because a model proposed it. BURHAN compiles supported validator primitives and qualifies them against positive and negative controls before use.
 
-## How GPT-5.6 was used
+### Protected boundaries
 
-SpecForge includes server-side GPT-5.6 Structured Outputs integration for an untrusted contract draft, followed by deterministic linting and human approval. Deterministic compiler fixtures pass. This submission does **not** claim successful live GPT-5.6 Platform API inference: the final live compiler evaluation was not completed because API quota was unavailable.
+A `ProofContract` defines allowed paths, forbidden paths, network policy, repair limits, and evidence requirements. Candidate changes outside the permitted boundary are rejected.
 
-## How Codex was used
+### Fresh verification
 
-Codex was used for the real historical Validator Architect and Executor runs. Its strategy and completion claim never determined the verdict. BURHAN's qualified pack, captured patch, and fresh verification determined the live `REJECTED` result.
+Where BURHAN claims independent verification, candidate state is captured and checked in a fresh workspace rather than trusting the agent's working directory.
+
+### Explicit assurance
+
+BURHAN distinguishes deterministic evidence, provider-backed execution, local artifact integrity, and unavailable evidence instead of collapsing them into a generic "success" claim.
+
+## Project status
+
+BURHAN is **early-stage open source (0.1.x)**.
+
+The current full reference verification path is Windows-native. Unit tests, type checks, and the web build are exercised across Windows, Linux, and macOS in CI. Cross-platform equivalence for the complete verification path is a roadmap item.
+
+Current assurance boundaries are documented in [the threat model](docs/threat-model.md). In particular, `local_trusted` is **not** a hardened sandbox, external attestation mechanism, malware-containment boundary, or mathematical proof system.
 
 ## Quick start
 
-Requirements: Node.js 20+ and npm. The primary workflow is Windows-native; Docker, WSL, and containers are not required.
+Requirements:
 
-```powershell
+- Node.js 20+
+- npm
+- Git
+
+Clone and install:
+
+```bash
+git clone https://github.com/gjt21123/BURHAN.git
+cd BURHAN
 npm ci
+```
+
+Start the demonstration UI:
+
+```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
-
-## Demo commands
-
-```powershell
-npm run dev
-```
-
-Follow [docs/demo-script.md](docs/demo-script.md). **Reset Demo** removes only temporary demo artifacts and returns the interface to the original `REJECTED` state.
-
-## Validation commands
-
-```powershell
-npm test
-npm run typecheck
-npm run build
-npm run eval:burhan
-npm run eval:compiler:fixtures
-npm run eval:codex:fixtures
-npm run eval:validator-qualification
-npm run eval:executor:fixtures
-npm run eval:execution-verification
-npm run eval:architect-output
-npm run eval:counterexample:fixtures
-npm run eval:repair-loop
-npm run eval:repair-orchestration
-npm run eval:submission-demo
-git diff --check
-```
-
-## Evaluation results
+Open:
 
 ```text
-Valid candidate accepted                 1 / 1
-Invalid candidates rejected              4 / 4
-False accepts                            0
-Compiler fixtures                        12 / 12
-Executor fixtures                        16 / 16
-Positive / negative controls             2 / 2, 4 / 4
-Qualification                            QUALIFIED
-Original live verdict                    REJECTED
-Deterministic repair verdict             VERIFIED
-SamePackProof                            PASS
-Original / repair receipt                VERIFIED / VERIFIED
-Receipt chain / tampering                VERIFIED / PASS
-Demo reset                               PASS
-Provider attempts in submission checks   0
+http://localhost:3000
 ```
 
-## Repository structure
+Portable validation:
+
+```bash
+npm run ci:portable
+```
+
+The full deterministic reference suite currently runs on Windows:
+
+```powershell
+npm run ci:verification
+```
+
+## Reference workflow
+
+BURHAN's payment-idempotency reference task requires:
+
+- exactly one charge from 20 concurrent requests using the same idempotency key;
+- independent behavior for distinct keys;
+- documentation of the `Idempotency-Key` API header;
+- no changes to protected migrations, tests, or dependency manifests.
+
+The repository includes intentionally invalid candidates so the verifier can demonstrate that it rejects failures rather than merely accepting a happy path.
+
+## Architecture
+
+The main pipeline is:
+
+1. **SpecForge** builds a bounded repository fact pack and contract draft.
+2. A human approves/seals the `ProofContract`.
+3. A validator architect may propose a `ValidatorBlueprint`.
+4. BURHAN deterministically lints and compiles supported validators.
+5. Validator qualification runs positive and negative controls.
+6. A separate executor performs the coding task.
+7. BURHAN captures the resulting candidate state.
+8. Verification runs against the sealed pack in a fresh workspace.
+9. Evidence records are linked and reduced into the final verdict.
+
+See:
+
+- [Architecture](docs/architecture.md)
+- [Threat model](docs/threat-model.md)
+- [Ecosystem role](docs/ecosystem.md)
+- [Product specification](docs/product-spec.md)
+
+## Trust boundaries
+
+| Boundary | Treatment |
+| --- | --- |
+| Model-generated contract draft | Untrusted until deterministic linting and human approval |
+| ValidatorBlueprint | Untrusted proposal |
+| Coding-agent output | Untrusted |
+| Agent completion claim | Untrusted |
+| Candidate patch/state | Untrusted until captured and verified |
+| Validator compiler templates | BURHAN-controlled |
+| Qualification controls | BURHAN-controlled |
+| Sealed validator pack | Protected artifact |
+| Fresh verification evidence | BURHAN-controlled |
+| Receipt-chain hashes/signatures | Local artifact-integrity mechanism |
+| `local_trusted` execution | Local independent execution; not a hardened sandbox |
+
+## Codex integration
+
+BURHAN includes a reference integration with OpenAI Codex.
+
+Codex can participate as a validator architect or task executor, but Codex output does **not** determine the verdict. The verifier, sealed validator pack, captured candidate state, and BURHAN-owned evidence remain authoritative.
+
+This separation is intentional and extends beyond any one model provider: provider-specific execution should remain behind narrow adapters while deterministic acceptance stays outside the agent.
+
+Historical prototype disclosures are preserved in [docs/codex-contributions.md](docs/codex-contributions.md).
+
+## Evaluation
+
+The repository contains deterministic fixtures and negative controls covering:
+
+- correct candidate acceptance;
+- sequential-only behavior that fails concurrency requirements;
+- protected test deletion;
+- forbidden migration changes;
+- fake evidence;
+- validator qualification;
+- executor-output validation;
+- repair-loop behavior;
+- receipt-chain integrity and tampering detection.
+
+Run individual suites with the scripts in `package.json`, or run the Windows reference verification suite:
+
+```powershell
+npm run ci:verification
+```
+
+Live/provider-backed evaluations are deliberately separate from ordinary CI. A contributor should not need maintainer credentials or API quota to prove deterministic correctness.
+
+## Repository layout
 
 ```text
-apps/web                       Submission demo UI
-packages/core                  Contracts, evidence, receipts, state machine
-packages/specforge             Fact Pack and contract compiler boundary
-packages/validator-compiler    Trusted templates and pack sealing
-packages/validator-qualification Qualification controls
-packages/codex-runner          Codex lifecycle, repair loop, safe reset
-packages/verifier              Fresh verification and linked receipts
-packages/workspace             Workspace and path-safety utilities
-examples/payment-service       Payment-idempotency fixture
-docs                           Submission materials and trust documentation
+apps/web                         Demonstration and inspection UI
+packages/cli                     CLI and reference evaluation entry point
+packages/core                    Contracts, evidence, receipts, state machine
+packages/specforge               Fact Pack and contract compiler boundary
+packages/validator-compiler      Trusted validator primitives and sealing
+packages/validator-qualification Positive/negative qualification controls
+packages/codex-runner            Codex adapter, execution and repair orchestration
+packages/verifier                Fresh verification, evidence and verdict logic
+packages/workspace               Workspace isolation and path-safety utilities
+examples/payment-service         Reference bounded coding task
+evals                            Valid and intentionally invalid candidates
+docs                             Architecture, threat model and project docs
+submission-assets                Historical prototype/submission media
 ```
 
-## Known limitations
+## Open-source maintenance
 
-- `local_trusted` does not protect against a compromised host, administrator-level attacker, malware, or unrestricted network behavior.
-- The original live run reports `REPAIR_CONTEXT_UNAVAILABLE` for same-thread repair.
-- GPT-5.6 live Platform API inference is not completed evidence because quota was unavailable.
-- BURHAN is not a formal proof system for arbitrary programs.
+BURHAN is maintained as a public OSS project, not merely as a code snapshot.
 
-## Security and secret handling
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Governance](GOVERNANCE.md)
+- [Maintainer guide](docs/maintainer-guide.md)
+- [Release process](docs/release-process.md)
+- [Roadmap](ROADMAP.md)
+- [Support](SUPPORT.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Changelog](CHANGELOG.md)
+- [Adopter registry](ADOPTERS.md)
 
-Fact Packs exclude secrets, Git metadata, binaries, build output, and protected paths. Codex credentials remain local to the CLI and are not copied into the browser or BURHAN artifacts. Submission materials must not contain credentials, hidden validator source, protected paths, raw provider streams, or private reasoning.
+GitHub Actions provide:
 
-## Hackathon submission notes
+- multi-platform unit/type/build checks;
+- the Windows-native full deterministic verification suite;
+- production dependency auditing;
+- CodeQL scanning;
+- dependency review on pull requests;
+- OpenSSF Scorecard monitoring;
+- an evidence-first release gate.
 
-- [Devpost copy](docs/devpost.md)
-- [Video package](docs/demo-script.md)
-- [Screenshot package](docs/screenshots.md)
-- [Final checklist](docs/submission-checklist.md)
-- [Codex and GPT-5.6 disclosure](docs/codex-contributions.md)
+## Contributing
 
-Create the final `submission-v1` tag only after human upload review.
+Issues, threat-model critiques, interoperability proposals, tests, documentation improvements, and implementation pull requests are welcome.
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md). Coding agents working in this repository should also read [AGENTS.md](AGENTS.md).
+
+For verification-sensitive changes, include the affected trust boundary and deterministic evidence in the pull request.
+
+## Security
+
+If you believe you found a vulnerability, **do not open a public issue with exploit details**. Follow [SECURITY.md](SECURITY.md).
+
+Useful reports include false-accept paths, protected-artifact bypasses, evidence tampering, command/path injection, credential leakage, unsafe handling of untrusted repositories, and assurance claims that exceed actual behavior.
+
+## Historical prototype material
+
+BURHAN began as a bounded demonstration with recorded submission assets. Those files remain in the repository for provenance and reproducibility, but they are not the project's long-term maintenance model.
+
+Historical material includes:
+
+- [demo script](docs/demo-script.md)
+- [submission notes](docs/devpost.md)
+- [screenshots](docs/screenshots.md)
+- [original submission checklist](docs/submission-checklist.md)
+
+## Roadmap
+
+Near-term priorities include:
+
+- a stable contributor-facing CLI;
+- complete cross-platform verification equivalence;
+- additional real-world reference tasks;
+- provider adapter contracts;
+- stronger fuzz/property testing around canonicalization and state transitions;
+- release provenance and signing;
+- hardened execution profiles distinct from `local_trusted`;
+- external adopter and integration examples.
+
+See [ROADMAP.md](ROADMAP.md).
+
+## License
+
+BURHAN is licensed under the [Apache License 2.0](LICENSE).
+
+Copyright 2026 BURHAN contributors.
