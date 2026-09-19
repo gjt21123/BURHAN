@@ -13,7 +13,7 @@ permissions:
 jobs:
   remediate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout feature branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,8 +29,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Apply non-breaking npm audit fixes
-        run: npm audit fix
+      - name: Apply audited dependency upgrades
+        run: npm audit fix --force
 
       - name: Verify production audit
         run: npm audit --omit=dev --audit-level=high
@@ -41,6 +41,7 @@ jobs:
       - name: Commit dependency remediation
         shell: bash
         run: |
+          git status --short
           if git diff --quiet -- package.json package-lock.json apps/web/package.json; then
             echo "No dependency files changed."
             exit 0
