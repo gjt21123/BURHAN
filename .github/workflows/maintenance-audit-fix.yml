@@ -32,18 +32,28 @@ jobs:
       - name: Apply audited dependency upgrades
         shell: bash
         run: |
-          # npm currently reports that Vitest and Next.js require major-version
-          # security upgrades. Preserve npm's remediation changes even when the
-          # first audit pass exits non-zero, then explicitly move Next/React to
-          # current patched releases.
           npm audit fix --force || true
           npm install --workspace @burhan/web next@16.3.5 react@19.3.0 react-dom@19.3.0
           npm install --workspace @burhan/web --save-dev @types/react@19.3.0 @types/react-dom@19.3.0
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'apps/web/package.json';
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+          pkg.scripts ??= {};
+          pkg.scripts.dev = 'next dev --webpack';
+          pkg.scripts.build = 'next build --webpack';
+          pkg.scripts.start = 'next start';
+          fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+          NODE
 
       - name: Verify full dependency audit
         run: npm audit --audit-level=high
 
       - name: Run portable validation
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          OPENAI_API_KEY: ""
+          CODEX_API_KEY: ""
         run: npm run ci:portable
 
       - name: Commit dependency remediation
