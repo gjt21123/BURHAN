@@ -1,0 +1,10 @@
+# Primary ownership while BURHAN has a single maintainer.
+* @gjt21123
+
+# Trust-boundary documentation and verification components require maintainer review.
+/docs/ @gjt21123
+/packages/verifier/ @gjt21123
+/packages/validator-compiler/ @gjt21123
+/packages/validator-qualification/ @gjt21123
+/packages/workspace/ @gjt21123
+/.github/workflows/ @gjt21123
