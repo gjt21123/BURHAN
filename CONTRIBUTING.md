@@ -20,7 +20,7 @@ For non-trivial changes, open an issue first and describe the problem, proposed 
 
 Requirements:
 
-- Node.js 20 or newer
+- Node.js 20.9 or newer
 - npm
 - Git
 - Windows is the currently validated primary execution environment; portability work is welcome.
