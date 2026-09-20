@@ -18,6 +18,7 @@ export function pointerTokens(pointer) {
 }
 export function validateContract(contract) {
   exactKeys(contract, ['schemaVersion', 'profile', 'title', 'allowedPaths', 'forbiddenPaths', 'requireChanges', 'checks'], ['$schema']);
+  if (Object.hasOwn(contract, '$schema')) requireThat(typeof contract.$schema === 'string' && contract.$schema.length <= 2048, 'SCHEMA_INVALID', 'Schema metadata must be a bounded string.');
   requireThat(contract.schemaVersion === 1 && contract.profile === PROFILE, 'PROFILE_UNSUPPORTED', 'Only the explicit static Git snapshot profile is supported.');
   requireThat(typeof contract.title === 'string' && contract.title.trim().length > 0 && contract.title.length <= 160 && !/[\x00-\x1f\x7f]/.test(contract.title), 'SCHEMA_INVALID', 'Expected a bounded printable title.');
   for (const key of ['allowedPaths', 'forbiddenPaths']) requireThat(Array.isArray(contract[key]) && contract[key].length <= 128 && contract[key].every(validPattern) && new Set(contract[key]).size === contract[key].length, 'SCHEMA_INVALID', 'Paths must use exact names, directory/**, or **; duplicates are invalid.');
@@ -27,7 +28,7 @@ export function validateContract(contract) {
   for (const check of contract.checks) {
     requireThat(check && typeof check === 'object', 'SCHEMA_INVALID', 'Invalid check.');
     const fields = { exists: [], absent: [], textIncludes: ['value'], jsonEquals: ['pointer', 'value'], sha256: ['value'] };
-    requireThat(Object.hasOwn(fields, check.kind), 'CHECK_UNSUPPORTED', 'Unknown validator primitive; arbitrary commands are not supported.');
+    requireThat(typeof check.kind === 'string' && Object.hasOwn(fields, check.kind), 'CHECK_UNSUPPORTED', 'Unknown validator primitive; arbitrary commands are not supported.');
     exactKeys(check, ['id', 'kind', 'path', ...fields[check.kind]]);
     requireThat(typeof check.id === 'string' && /^[A-Za-z][A-Za-z0-9_-]{0,47}$/.test(check.id) && !ids.has(check.id), 'SCHEMA_INVALID', 'Check identifiers must be unique and printable.');
     ids.add(check.id);
@@ -47,7 +48,9 @@ export function makeSeal(contract, baseCommit) {
   validateContract(contract);
   requireThat(validOid(baseCommit), 'COMMIT_REQUIRED', 'Use a full lowercase commit object ID.');
   const payload = { kind: 'burhan.static-seal.v1', profile: PROFILE, baseCommit, contractHash: digest('burhan.contract.v1', contract), contract };
-  return { ...payload, sealHash: digest('burhan.seal.v1', payload) };
+  const seal = { ...payload, sealHash: digest('burhan.seal.v1', payload) };
+  requireThat(Buffer.byteLength(JSON.stringify(seal, null, 2)) + 1 <= LIMITS.jsonBytes, 'SEAL_LIMIT', 'The formatted seal exceeds the 256 KiB input limit. Reduce contract size.');
+  return seal;
 }
 export function validateSeal(seal, expectedHash) {
   requireThat(validDigest(expectedHash), 'PIN_REQUIRED', 'An independently retained --expect-seal SHA-256 pin is required.');

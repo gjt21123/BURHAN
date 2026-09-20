@@ -38,6 +38,8 @@ test('unknown fields and command validators fail closed', () => {
   assert.throws(() => validateContract({ ...starterContract(), command: 'echo unsafe' }), expectCode('SCHEMA_INVALID'));
   const value = starterContract(); value.checks[0] = { id: 'CMD', kind: 'command', path: 'src/a', command: 'node x.js' };
   assert.throws(() => validateContract(value), expectCode('CHECK_UNSUPPORTED'));
+  for (const kind of [['exists'], null, 3, {}]) assert.throws(() => validateContract({ ...starterContract(), checks: [{ id: 'KIND', kind, path: 'src/a' }] }), expectCode('CHECK_UNSUPPORTED'));
+  assert.throws(() => validateContract({ ...starterContract(), $schema: {} }), expectCode('SCHEMA_INVALID'));
 });
 test('a contract cannot silently select runtime assurance', () => assert.throws(() => validateContract({ ...starterContract(), profile: 'runtime' }), expectCode('PROFILE_UNSUPPORTED')));
 test('empty checks, duplicate IDs, and empty required text are rejected', () => {
@@ -52,6 +54,9 @@ test('seal binds contract and full baseline independently of key order', () => {
   const seal = makeSeal(starterContract(), base);
   assert.equal(validateSeal(seal, seal.sealHash), seal);
   assert.throws(() => validateSeal({ ...seal, baseCommit: 'b'.repeat(40) }, seal.sealHash), expectCode('SEAL_MISMATCH'));
+  const large = { ...starterContract(), checks: Array.from({ length: 64 }, (_, index) => ({ id: 'C' + index, kind: 'textIncludes', path: 'docs/api.md', value: 'x'.repeat(3970) })) };
+  validateContract(large);
+  assert.throws(() => makeSeal(large, base), expectCode('SEAL_LIMIT'));
 });
 test('a substituted contract and recalculated seal still fail the independent pin', () => {
   const seal = makeSeal(starterContract(), base);
