@@ -54,7 +54,10 @@
     "validate:codex-output-schema": "npm run validate:output-schema --workspace @burhan/codex-runner",
     "eval:codex:live": "npm run eval:live --workspace @burhan/codex-runner",
     "eval:validator-qualification": "npm run eval --workspace @burhan/validator-qualification",
-    "burhan": "npm run burhan --workspace @burhan/cli"
+    "burhan": "node packages/cli/portable/bin/burhan.mjs",
+    "burhan:legacy": "tsx packages/cli/src/index.ts",
+    "test:cli": "node --test packages/cli/portable/tests/*.test.mjs",
+    "test:cli-package": "node scripts/test-cli-package.mjs"
   },
   "devDependencies": {
     "@openai/codex": "0.144.0",
