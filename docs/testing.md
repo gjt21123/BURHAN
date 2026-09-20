@@ -2,21 +2,23 @@
 
 ## Portable checks
 
-`npm run ci:portable` runs workspace unit tests, TypeScript checking and a production web build. Supported CI combinations are Linux, macOS and Windows with Node.js 22 and 24. Type generation is part of the web typecheck; generated files are not versioned.
+`npm run ci:portable` runs workspace unit tests, TypeScript checking and a production web build. CI covers Linux, macOS and Windows with Node.js 22 and 24. Type generation is part of web typechecking; generated files are not versioned.
 
-`node scripts/smoke-web.mjs` runs **after the build**. It launches a temporary loopback-only production server with live compilation disabled, checks the homepage, compiler opt-in gate, malformed/invalid input, body limits, content type, cross-origin compilation/reset rejection and a normal local reset, then stops the server. It does not test live provider inference.
+`npm run test:cli-package` packs the actual standalone CLI, installs it offline outside the monorepo and checks three independent fixture repositories with positive/negative controls. Those fixtures are not external adopters. The static CLI suite has 71 tests.
 
-`apps/web/tests/local-api.test.mjs` has 22 focused tests covering Host/Origin validation, IPv4/IPv6 loopback, JSON parsing, truthful streaming byte limits, invalid UTF-8, body-read timeout, task validation and concurrency-gate release after success/failure. They run under `npm test` without installing another test framework.
+`node scripts/smoke-web.mjs` runs after the build. It launches a temporary loopback-only production server with live compilation disabled, checks the homepage and safe compiler/reset behavior, then stops the server. The nine HTTP checks do not invoke live provider inference. The local API guard suite contains 22 focused regressions.
 
-## Full Windows reference suite
+## Deterministic runtime reference suite
 
-```powershell
+```bash
 npm run ci:verification
 ```
 
-This aggregates the existing `eval:burhan`, compiler/Codex/executor fixtures, validator qualification, execution verification, architect-output validation, repair loop/orchestration and submission-demo evaluation commands. It uses no live-provider credentials. The repository must include its Git history/tags; use a normal Git checkout with full history for reproduction.
+This aggregates `eval:burhan`, compiler/Codex/executor fixtures, validator qualification, execution verification, architect-output checks, repair loop/orchestration and submission-demo checks. The Runtime verification workflow runs all ten suites on Linux, macOS and Windows with Node 22 and 24. A full Git checkout including historical tags is required for these original reference cases.
 
-A fixture's name or a passing script does not establish arbitrary program correctness. Inspect the positive and negative controls and the protected-path assumptions. A deterministic repair is not evidence of a fresh live Codex retry.
+The new process backend has 31 direct regressions for argument boundaries, environment hygiene, deadlines, output limits, cancellation and ordinary descendant cleanup. Nine additional tests cover independently retained pack hashes and pass/reject/incomplete reduction. See [runtime portability](runtime-portability.md) for exact scope and remaining in-process paths.
+
+A passing reference suite is not arbitrary program correctness, full hostile-code containment, or proof that a generic external runtime workflow is ready. Never classify unavailable or interrupted execution as success. A deterministic repair is not a fresh live Codex retry.
 
 ## Repository hygiene
 
@@ -24,10 +26,10 @@ A fixture's name or a passing script does not establish arbitrary program correc
 node scripts/check-repository.mjs
 ```
 
-Checks required OSS documents, license metadata, conservative secret patterns, relative Markdown file links, accidental tracked environment/generated files and application-draft text limits. It does not crawl external links, validate all anchors, scan all binary assets or prove that repository history is secret-free.
+Checks required OSS documents, license metadata, conservative secret patterns, relative Markdown file links, accidentally tracked environment/generated files and application-draft text limits. It does not crawl external links, validate every anchor, scan all binary assets or prove repository history is secret-free.
 
-## Reading CI results
+## Reading evidence
 
-Do not remove a failing check to claim success. Classify failures as implementation, environment, data, or unavailable integration, retain the evidence and repair the cause. Dependency graph unavailability is reported explicitly; the full npm vulnerability gate remains mandatory. A CodeQL workflow success means analysis completed, not that every vulnerability is absent.
+Classify failures as implementation, environment, input or unavailable integration; preserve the failure and repair its cause. Do not remove a failing check to claim success. Dependency graph unavailability is explicit and does not disable the full npm audit. CodeQL workflow success means analysis completed, not exhaustive vulnerability absence.
 
-The [validation record](codex-for-oss/validation.md) identifies an inspected SHA and run. For releases, prefer the exact CI/scan URLs and commit in the attached `validation.json`.
+For current development, use the exact PR head and its CI/Runtime verification/CodeQL results. Historical [validation records](codex-for-oss/validation.md) remain tied to their recorded SHA. Existing release metadata does not automatically apply to newer commits. New reference runs do not replace historical live-provider evidence.

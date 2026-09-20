@@ -4,88 +4,47 @@ This file defines how coding agents should work in BURHAN.
 
 ## Mission
 
-BURHAN independently verifies bounded coding-agent work. A model's statement that a task is complete is **untrusted input**. Changes must preserve the separation between agent output and BURHAN-owned evidence.
+BURHAN independently verifies bounded coding-agent work. A model's statement that a task is complete is untrusted input. Preserve the separation between agent output and BURHAN-owned acceptance evidence.
 
 ## Read first
 
-Before changing verification behavior, read:
-
-1. `README.md`
-2. `docs/architecture.md`
-3. `docs/threat-model.md`
-4. `CONTRIBUTING.md`
+Before changing verification behavior, read `README.md`, `docs/architecture.md`, `docs/threat-model.md`, `docs/runtime-portability.md` and `CONTRIBUTING.md`.
 
 ## Trust rules
 
-Do not weaken these invariants without an explicit design discussion:
-
 - Candidate/agent output never determines its own verdict.
-- Sealed contracts and validator packs are protected artifacts.
-- Validators are qualified against positive and negative controls.
-- Verification that claims independence runs against captured candidate state in a fresh workspace.
-- Missing, contradictory, or unverifiable evidence fails closed.
-- Documentation and UI must not claim stronger assurance than the implementation provides.
-- `local_trusted` is not a hardened sandbox or remote attestation system.
+- Sealed contracts and qualified validator packs are protected artifacts. Keep independently retained seal identity separate from candidate data.
+- Qualification needs positive and negative controls.
+- A workflow claiming independent runtime verification must check captured candidate state in a fresh workspace.
+- Empty, contradictory, interrupted or unverifiable evidence is incomplete, never a successful verdict.
+- Static `PASSED` is not runtime `VERIFIED`; the static CLI must not execute candidate code.
+- A portable process runner does not mean every legacy in-process path is supervised. Inspect the actual call path before claiming bounded execution.
+- `local_trusted` is not a secure sandbox, network-isolation mechanism or remote attestation.
+- UI, logs and docs must not claim more than their actual checks establish.
 
-## Scope discipline
+## Scope and sensitive data
 
-Prefer the smallest change that solves the issue. Avoid opportunistic refactors in trust-boundary code.
-
-Never commit:
-
-- API keys or tokens;
-- private keys;
-- raw provider credentials;
-- hidden validator source in public evidence;
-- private model reasoning;
-- generated local run directories;
-- machine-specific state.
+Use focused changes. Avoid unrelated refactors in trust-boundary code. Never commit credentials, private keys, raw provider streams, private model reasoning, hidden validator source in public evidence, generated local run directories or machine-specific state.
 
 ## Validation
-
-Portable checks:
 
 ```bash
 npm ci
 npm test
 npm run typecheck
 npm run build
+npm run ci:verification
+npm run test:cli-package
+node scripts/check-repository.mjs
+git diff --check
 ```
 
-The full deterministic verification suite currently has a Windows-native execution path and should be run on Windows:
+CI exercises portable unit/type/build/package checks and the ten deterministic runtime reference suites on Linux, macOS and Windows with Node 22 and 24. This covers the bounded reference fixtures, not generic arbitrary-repository runtime support. Inspect both CI and Runtime verification on the exact PR head before merge.
 
-```powershell
-npm run eval:burhan
-npm run eval:compiler:fixtures
-npm run eval:codex:fixtures
-npm run eval:validator-qualification
-npm run eval:executor:fixtures
-npm run eval:execution-verification
-npm run eval:architect-output
-npm run eval:repair-loop
-npm run eval:repair-orchestration
-npm run eval:submission-demo
-```
+Live/provider-backed evaluations remain separate. An ordinary contribution must not require maintainer credentials or external model quota. Do not claim a recorded fixture is a new live run.
 
-Live/provider-backed evaluations are separate from deterministic CI and must not be required for an ordinary pull request.
+## Verification tests and pull requests
 
-## Tests for verification changes
+Include a positive control, negative control and regression for changed behavior. Test protected paths/evidence, cancellation and unavailable evidence when relevant. Identify the affected trust boundary, commands actually run, observed results, failure handling and documentation changes.
 
-A change to verifier/compiler/qualification behavior should normally include:
-
-- a positive control that should pass;
-- at least one negative control that must fail;
-- a regression test for the reported failure mode;
-- a check that protected paths/evidence cannot be silently rewritten.
-
-## Pull requests
-
-In the PR body explain:
-
-- the problem;
-- the trust-boundary impact;
-- deterministic evidence;
-- failure behavior;
-- documentation changes.
-
-If a task is ambiguous in a way that can change the assurance boundary, stop and surface the ambiguity instead of silently choosing the weaker interpretation.
+Do not weaken validators, discard source changes, skip failing cases or manufacture adoption to obtain a green report. Distinguish maintainer-directed automation from external contribution or independent review.

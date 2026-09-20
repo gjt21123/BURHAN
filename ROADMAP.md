@@ -1,67 +1,59 @@
 # BURHAN Roadmap
 
-This roadmap describes intended directions, not promises or deadlines. Work is accepted when it preserves BURHAN's trust model and can be evaluated with deterministic evidence.
+Work is accepted when its trust boundaries and actual validation are explicit. This roadmap is not a promise of program selection, external adoption or completion dates.
 
-## Phase A implementation record
+## Phase A — first portable static distribution
 
-The first increment is the [portable static CLI preview](docs/portable-cli.md), tracked in issue #9. It provides independently pinned contracts, immutable Git snapshot checks and an offline-tested tarball without BURHAN milestone dependencies. This is not the complete runtime-verifier portability milestone. Automated independent repositories are fixtures, not external adopters.
+Delivered in PR #10 / issue #9:
 
-- [x] Implement a dependency-free static-profile CLI with explicit commands, exit codes and JSON reports.
-- [x] Require full commit IDs and an independently retained contract seal pin.
-- [x] Package the actual CLI with an allowlist and offline installation tests outside the monorepo.
-- [x] Add positive/negative, tampering, path and malformed-input regressions to cross-platform CI.
-- [ ] Generalize the qualified runtime backend and remove Windows-only dependencies from that separate execution path.
-- [ ] Validate real Codex and Claude adapters without mixing live evidence with deterministic fixtures.
-- [ ] Ship a maintainer-pinned GitHub Actions reference integration after runtime boundaries are reviewed.
-- [ ] Establish real external use and meaningful independent contributions; do not count generated fixtures or maintainer-directed automation.
+- [x] Dependency-free static-profile CLI, JSON reports and distinct exit codes.
+- [x] Full commit IDs and independently retained contract seal pins.
+- [x] Allowlisted tarball installed offline outside the monorepo.
+- [x] Positive/negative, tampering, path and malformed-input regressions on six OS/Node combinations.
 
-## Near term — make the core easy to adopt
+See [portable CLI](docs/portable-cli.md). Maintainer-created test repositories are fixtures, not adopters. Static PASSED is not runtime correctness.
 
-- [ ] Stable, documented CLI surface for common runtime verification workflows; static preview is available separately.
-- [ ] Reproducible general-purpose runtime install and quick-start path from a clean clone.
-- [ ] Cross-platform runtime verification coverage for Windows, Linux, and macOS where the assurance model is equivalent.
-- [ ] Runtime example projects beyond payment idempotency.
-- [ ] Machine-readable evidence schema documentation and compatibility policy.
-- [ ] Versioned releases with changelog and migration notes.
-- [ ] Contributor-friendly issue taxonomy and triage process.
+## Phase B — runtime portability and generic inputs
+
+The process/reference increment is tracked in PR #12; the complete milestone remains issue #11.
+
+- [x] Portable local command backend with narrow environments, shell-free launch, timeout, cancellation, output limits and explicit cleanup outcomes.
+- [x] Preserve the legacy exported name while using the portable backend.
+- [x] Exercise all ten deterministic reference suites on Linux/macOS/Windows with Node 22/24.
+- [x] Distinguish functional failure from incomplete/blocked execution in the command-based evaluator.
+- [x] Check the original retained validator-pack hash around command execution; retain legacy serialization compatibility.
+- [ ] Migrate the remaining in-process candidate-import path to approved bounded execution, with negative controls.
+- [ ] Accept generic repository/base/head/contract/qualification inputs without historical payment-fixture or milestone dependencies.
+- [ ] Review portable fresh workspace construction, cancellation and integrity across the complete generic pipeline.
+- [ ] Exercise multiple independent runtime examples before real-project pilots.
+
+See [runtime portability](docs/runtime-portability.md). Ordinary local process cleanup is not a sandbox or guarantee against detached/reparented malicious processes.
+
+## Provider interoperability and adoption
+
+- [ ] Validate real Codex and Claude adapters under a narrow shared contract, with explicit budgets and separate live evidence.
+- [ ] Publish a maintainer-pinned GitHub Actions integration after runtime boundaries are reviewed.
+- [ ] Establish opt-in real external use, repeated usage and meaningful independent contributions.
+- [ ] Record real cases where independently owned checks add value beyond agent self-report.
+- [ ] Confirm registry ownership and release provenance before public npm publication.
 
 ## Verification depth
 
-- [ ] Additional negative-control libraries for common coding-agent failure modes.
-- [ ] Stronger protected-path and workspace-isolation invariants.
-- [ ] Better diagnostics for incomplete, contradictory, or non-reproducible evidence.
-- [ ] Explicit provenance links from contract → validator pack → candidate → verdict.
-- [ ] Property-based and fuzz testing for parsers, canonicalization, and state-machine transitions.
-
-## Provider interoperability
-
-- [ ] Keep provider-specific execution behind narrow adapters.
-- [ ] Add documented adapter contracts for additional coding agents.
-- [ ] Ensure deterministic verification can run without provider credentials.
-- [ ] Record provider metadata without allowing it to determine the verdict.
+- [ ] Broader negative-control libraries for coding-agent failure modes.
+- [ ] Stronger protected-path/workspace invariants throughout every legacy path.
+- [ ] Property/fuzz tests for parsers, canonicalization, evidence and state transitions.
+- [ ] Versioned machine-readable evidence compatibility and migration policies.
+- [ ] Extend tampering/replay defenses without implying external attestation.
 
 ## Security and supply chain
 
-- [ ] Continuous dependency review and code scanning.
-- [ ] OpenSSF Scorecard monitoring and hardening.
-- [ ] Signed release artifacts/provenance where the release pipeline can support it safely.
-- [ ] Document a hardened remote/sandbox execution profile distinct from `local_trusted`.
-- [ ] Expand tampering and replay resistance tests.
+- [x] Deterministic CI, dependency auditing and CodeQL workflows.
+- [x] Public contribution, security, governance and release policies.
+- [ ] Repository administration settings tracked in issue #3, including the unavailable Dependency graph comparison and required-review/ruleset enforcement.
+- [ ] Reviewed release signing/provenance beyond local checksums.
+- [ ] Hardened remote execution profile distinct from `local_trusted`.
+- [ ] Independent security review and full sensitive-history/asset audit.
 
-## Community and ecosystem
+## Non-goals
 
-- [ ] Publish reusable integrations for CI systems and coding-agent workflows.
-- [ ] Add end-to-end examples contributed by external users.
-- [ ] Define a compatibility test kit for third-party validator packs/adapters.
-- [ ] Maintain public security, contribution, governance, and release policies.
-
-## Explicit non-goals
-
-BURHAN does not currently aim to:
-
-- prove arbitrary program correctness mathematically;
-- declare an AI agent trustworthy based on self-reported completion;
-- claim `local_trusted` is a hardened malware sandbox;
-- hide uncertainty behind a binary success UI.
-
-Issues and pull requests that move these roadmap items forward are welcome.
+No arbitrary-program mathematical proof, self-certified agent success, fabricated community metrics, or concealment of uncertainty behind a binary success label. See [ADOPTERS.md](ADOPTERS.md) for evidence-based external-use reporting.

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Phase B: bounded command backend and runtime reference portability
+
+- Add `runLocalCommand`, preserving the old Windows-named export as a compatibility alias.
+- Resolve npm/npx through installation-local JavaScript entrypoints without a `.cmd` shell; restrict inherited child environments and scope home/temp/cache settings to the run.
+- Add owned supervision, POSIX process groups/Windows tree termination, timeout, cancellation, combined output caps and explicit cleanup failure reporting.
+- Add 31 backend regressions and nine independently pinned pack/verdict regressions.
+- Exercise all ten deterministic reference suites on Linux, macOS and Windows with Node 22 and 24; retain the existing CI and original Windows reference job.
+- Compare canonical directory identity in the macOS cwd test rather than treating `/var` and `/private/var` aliases as different directories.
+- Preserve blocked/incomplete outcomes in the command-based evaluator; reject known protected-path violations before execution and check protected files afterwards.
+- Check independently retained legacy validator-pack hashes before/after validators without changing historical serialization or receipt formats.
+- Document that generic repository runtime inputs and the remaining in-process candidate path are still open work. No new live-provider or external-adoption claim.
+
 ### Phase A: portable static CLI distribution (0.3.0-preview.1)
 
 - Add a dependency-free CLI for doctor/init, contract validation and explicit sealing, immutable-commit verification, reports and pinned report-integrity checks.
@@ -10,7 +22,7 @@
 - Add 71 isolated regression tests and actual offline tarball installation on three independent Git fixtures with positive/negative controls in all six CI OS/Node combinations.
 - Preserve tested tarballs, checksums and validation metadata as CI artifacts. No npm registry publication or external adoption is claimed.
 - Route `npm run burhan` to the portable preview; retain historical receipt/eval commands via `npm run burhan:legacy` and unchanged `npm run eval:burhan`.
-- Keep the runtime compiler, qualified validator packs, signed evidence/repair flow and full Windows reference suite unchanged. Runtime portability remains a separate open milestone.
+- At the Phase A delivery, the runtime compiler, qualified packs, signed evidence/repair flow and Windows reference suite were preserved. See the subsequent Phase B changes above.
 
 ## 0.2.0 — OSS preview — 2026-09-20
 
@@ -38,7 +50,7 @@
 - Resolved the monorepo root for compilation and sanitized reset failures.
 - Upgraded the web stack to Next.js 16.3.5 and React/React DOM 19.3.0; updated Vitest to 4.1.11 and pinned third-party Actions by commit SHA.
 - Use Node 22 or 24. The package compatibility floor remains 20.9; that older line is not covered by the current CI matrix.
-- Full reference execution remains Windows-native. `local_trusted` is not a sandbox, formal proof or external attestation.
+- The 0.2.0 release's full reference execution was Windows-native. `local_trusted` is not a sandbox, formal proof or external attestation.
 
 ## 0.1.0 — initial public prototype — 2026-07-21
 

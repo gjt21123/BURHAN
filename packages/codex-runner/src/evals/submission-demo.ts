@@ -10,7 +10,8 @@ const hash = (character: string) => `sha256:${character.repeat(64)}`;
 const pack = { contractHash: hash("a"), validatorPackContentHash: hash("b"), qualificationReportHash: hash("c"), compilerVersion: "1", compiledFileHashes: { "same.test.ts": hash("d") }, integrity: "intact" as const };
 const proof = buildSamePackProof(pack, pack, "deterministic-rejected", "deterministic-repair", "2026-07-21T00:00:00.000Z");
 const labels = ["LIVE CODEX RUN", "LIVE BURHAN VERIFICATION", "DETERMINISTIC REPAIR DEMO"];
-const evidenceAvailable = true;
+// This script constructs receipt fixtures and checks reset/integrity behavior.
+// It does not inspect retained live-provider bundles or execute a coding agent.
 const repositoryRoot = await findRepositoryRoot(process.cwd());
 const demoRoot = demoRootForRepository(repositoryRoot);
 
@@ -72,23 +73,22 @@ try {
 const resetComplete = markerProtectionWorks && pathEscapeRejected && artifactsRemoved && restoredOriginalState && resetTwiceSafe && receiptRegenerated;
 const result = receiptsComplete && tamperingDetected && resetComplete && verifySamePackProof(proof) && labels.length === 3;
 
-console.log("BURHAN SUBMISSION DEMO\n");
-console.log(`Real live Architect evidence:          ${evidenceAvailable ? "AVAILABLE" : "MISSING"}`);
-console.log(`Real live Executor evidence:           ${evidenceAvailable ? "AVAILABLE" : "MISSING"}`);
-console.log(`Real live BURHAN rejection:            ${evidenceAvailable ? "AVAILABLE" : "MISSING"}`);
-console.log("Old live repair context:               UNAVAILABLE");
-console.log("Limitation reported honestly:          YES");
-console.log("Deterministic repair demo:             PASS");
-console.log("Original verdict:                      REJECTED");
-console.log("Final repair verdict:                  VERIFIED");
-console.log(`Mode labels accurate:                  ${labels.length === 3 ? "PASS" : "FAIL"}`);
-console.log(`SamePackProof:                         ${verifySamePackProof(proof) ? "PASS" : "FAIL"}`);
-console.log(`Original receipt verified:             ${receiptsComplete ? "YES" : "NO"}`);
-console.log(`Repair receipt verified:               ${receiptsComplete ? "YES" : "NO"}`);
-console.log(`Receipt chain verified:                ${receiptsComplete ? "YES" : "NO"}`);
-console.log(`Tampering detected:                    ${tamperingDetected ? "YES" : "NO"}`);
+console.log("BURHAN RECEIPT / RESET DEMO CHECKS\n");
+console.log("Scope:                                 CONSTRUCTED DETERMINISTIC FIXTURES");
+console.log("Historical live provider bundles:      NOT REVALIDATED BY THIS SCRIPT");
+console.log("New live Architect / Executor runs:    NOT REQUESTED");
+console.log("Live repair context:                   NOT EVALUATED");
+console.log(`Constructed original receipt verdict:  ${attempt1.verdict.toUpperCase()}`);
+console.log(`Constructed repair receipt verdict:    ${attempt2.verdict.toUpperCase()}`);
+console.log(`Declared label fixture:                ${labels.length === 3 ? "PASS" : "FAIL"}`);
+console.log("Actual UI disclosure rendering:        NOT EVALUATED");
+console.log(`SamePackProof fixture:                  ${verifySamePackProof(proof) ? "PASS" : "FAIL"}`);
+console.log(`Original receipt integrity:            ${receiptsComplete ? "PASS" : "FAIL"}`);
+console.log(`Repair receipt integrity:              ${receiptsComplete ? "PASS" : "FAIL"}`);
+console.log(`Receipt chain integrity:               ${receiptsComplete ? "PASS" : "FAIL"}`);
+console.log(`Tampering fixture rejected:            ${tamperingDetected ? "YES" : "NO"}`);
 console.log(`Demo reset:                            ${resetComplete ? "PASS" : "FAIL"}`);
-console.log("False accepts:                         0");
-console.log("Provider attempts:                     0");
+console.log("Runtime false-accept metric:           NOT MEASURED BY THIS SCRIPT");
+console.log("Provider attempts requested:           0");
 console.log(`Result:                                ${result ? "PASS" : "FAIL"}`);
 process.exitCode = result ? 0 : 1;

@@ -1,64 +1,45 @@
 # Contributing to BURHAN
 
-BURHAN evaluates agent-authored changes. Contributions must preserve independent acceptance, reproducible evidence, explicit trust boundaries and fail-closed behavior.
+Preserve independent acceptance, reproducible evidence, explicit trust boundaries and fail-closed behavior.
 
-Read the [README](README.md), [architecture](docs/architecture.md), [threat model](docs/threat-model.md), [governance](GOVERNANCE.md) and [security policy](SECURITY.md). For a non-trivial change, describe the problem, affected trust boundary and proposed tests in an issue before broad refactoring. Coding agents also follow [AGENTS.md](AGENTS.md).
+Read the [README](README.md), [architecture](docs/architecture.md), [threat model](docs/threat-model.md), [runtime boundaries](docs/runtime-portability.md), [governance](GOVERNANCE.md) and [security policy](SECURITY.md). Describe non-trivial changes and affected trust boundaries before broad refactoring. Coding agents also follow [AGENTS.md](AGENTS.md).
 
-## Setup
+## Setup and checks
 
-Use Git, npm and Node.js 22 or 24:
+Use Git, npm and Node.js 22 or 24. The local UI starts with `npm ci` then `npm run dev` at `http://127.0.0.1:3000`. No API key is needed for ordinary development or deterministic validation.
 
 ```bash
 npm ci
-npm run dev
-```
-
-Visit `http://127.0.0.1:3000`. Do not configure an API key for ordinary development or deterministic validation. Live provider-backed evaluations are separate, optional and may incur costs.
-
-## Required validation
-
-Portable checks on Windows, Linux or macOS:
-
-```bash
 npm run ci:portable
+npm run ci:verification
+npm run test:cli-package
 node scripts/check-repository.mjs
 node scripts/smoke-web.mjs
 git diff --check
 git diff --exit-code
 ```
 
-Run the smoke script after the production build included in `ci:portable`. It starts and stops a local server, exercises safe API behavior and leaves live compilation disabled. Next.js type declarations are generated and ignored; do not commit `apps/web/next-env.d.ts`.
+The smoke script requires the production build included in `ci:portable`; it starts/stops a local server with live compilation disabled. Do not commit generated `apps/web/next-env.d.ts`.
 
-The complete reference execution/verification path remains Windows-native:
+The ten complete deterministic reference suites are exercised on Windows, Linux and macOS with Node 22/24. Their original examples require full Git history/tags. This is not generic external-repository runtime support; static CLI packaging and runtime execution have distinct scopes. Inspect both CI and Runtime verification jobs on the final PR commit.
 
-```powershell
-npm run ci:verification
-```
-
-Contributors on other operating systems should run the portable checks and inspect the Windows CI job, not claim that the full reference path ran locally. No maintainer credentials or external model quota are needed for these gates.
+Live evaluations are optional, separate, cost-bearing work. Never require maintainer credentials or API quota for deterministic contributor checks.
 
 ## Verification changes
 
-Preserve these invariants:
-
 - Agent-authored code, tests, explanations and completion claims remain untrusted.
-- Qualified validator packs and sealed contracts cannot be redefined by the candidate.
-- BURHAN-owned evidence determines acceptance in a fresh workspace.
-- Missing, contradictory or unverifiable evidence fails closed.
-- UI and documentation must not claim stronger assurance than the implementation.
+- Approved contracts/packs must not be redefined by candidate-controlled data. Retain approval pins independently where supported.
+- Evidence determines acceptance; empty, blocked, contradictory or unverifiable evidence stays incomplete.
+- Static PASSED must never be presented as executed/runtime VERIFIED.
+- A portable subprocess API does not supervise a caller that still imports candidate modules in-process.
+- Documentation and logs must not overstate runtime assurance, live execution or test coverage.
 
-Include a positive control, a negative control that must fail, and a regression for the reported failure. Describe protected-path/evidence impact and rollback behavior. Do not weaken validators or skip failing tests to obtain a green check.
+Include positive and negative controls, a regression for the failure, protected-path/evidence impact and rollback behavior. Preserve exact argument boundaries, environment hygiene and resource limits when changing process execution. Document ordinary-child cleanup separately from deliberately detached/hostile-code containment.
 
-## Pull requests
+## Pull requests and hygiene
 
-State the problem, implementation, affected trust boundaries, exact commands run, observed results and known limitations. Distinguish local results from CI results and live-provider execution from deterministic fixtures. Keep changes focused and update relevant documentation.
+State the problem, implementation, trust impact, commands actually run, observed results and remaining scope. Distinguish local from GitHub CI checks, historical records from new live runs, and maintainer automation from independent review or external adoption.
 
-Automated or maintainer-authored work must not be presented as independent review, external adoption or a new human contributor. Do not fabricate issues, users, benchmarks, stars or usage metrics.
+Do not skip failing tests, discard source changes or fabricate metrics to make results look stronger. Never commit credentials, private reasoning, raw provider streams, hidden validator source in public evidence, generated run directories or local machine state. Repository pattern checks are not an exhaustive history/asset secret audit.
 
-## Hygiene and licensing
-
-Never commit keys, credentials, private reasoning, raw provider streams, hidden validator source in public evidence, generated run directories or machine-specific state. Conservative repository checks are not a substitute for reviewing the patch and history for sensitive data.
-
-Use descriptive commits, such as `verifier: reject unsupported evidence` or `test: cover protected-path regression`.
-
-By submitting a contribution, you intentionally submit it for inclusion under [Apache-2.0](LICENSE), unless agreed otherwise before acceptance. Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
+Use descriptive focused commits. Contributions are intentionally submitted for inclusion under [Apache-2.0](LICENSE), unless agreed otherwise before acceptance. Report vulnerabilities through [SECURITY.md](SECURITY.md), not public exploit discussions.
