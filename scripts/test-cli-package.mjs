@@ -26,8 +26,8 @@ function execute(entry, args, cwd = temp, expected = 0) {
 try {
   const packed = JSON.parse(execute(npm, ['pack', source, '--json', '--ignore-scripts', '--offline', '--pack-destination', temp]))[0];
   const paths = packed.files.map(file => file.path);
-  for (const path of ['bin/burhan.mjs', 'lib/verify.mjs', 'lib/contract.mjs', 'lib/git.mjs', 'LICENSE', 'README.md']) assert.ok(paths.includes(path), `Required packed file: ${path}`);
-  assert.ok(paths.every(path => /^(?:bin\/|lib\/|package\.json$|README\.md$|LICENSE$)/.test(path)), 'Tarball must not contain tests, credentials, legacy workspaces or media.');
+  for (const path of ['bin/burhan.mjs', 'lib/verify.mjs', 'lib/contract.mjs', 'lib/git.mjs', 'LICENSE', 'NOTICE', 'README.md']) assert.ok(paths.includes(path), `Required packed file: ${path}`);
+  assert.ok(paths.every(path => /^(?:bin\/|lib\/|package\.json$|README\.md$|LICENSE$|NOTICE$)/.test(path)), 'Tarball must not contain tests, credentials, legacy workspaces or media.');
   const consumer = join(temp, 'consumer'); await mkdir(consumer);
   await writeFile(join(consumer, 'package.json'), '{"name":"burhan-offline-consumer","version":"1.0.0","private":true}\n');
   const archive = join(temp, packed.filename);

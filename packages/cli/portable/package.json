@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "bin": { "burhan": "bin/burhan.mjs" },
-  "files": ["bin/", "lib/", "README.md", "LICENSE"],
+  "files": ["bin/", "lib/", "README.md", "LICENSE", "NOTICE"],
   "engines": { "node": ">=22" },
   "repository": { "type": "git", "url": "git+https://github.com/gjt21123/BURHAN.git", "directory": "packages/cli/portable" },
   "bugs": { "url": "https://github.com/gjt21123/BURHAN/issues" }
