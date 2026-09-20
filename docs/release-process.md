@@ -1,54 +1,29 @@
-# Release Process
+# Release process
 
-BURHAN uses evidence-first release management.
+The root `package.json` defines the project version. Before 1.0, interfaces may change; release notes must distinguish compatibility changes, deterministic behavior, live-provider evidence and limitations.
 
-## Versioning
+## Required evidence
 
-The repository uses semantic versioning where practical. Before 1.0, minor releases may include interface changes, but release notes must call them out explicitly.
+From a clean checkout, run `npm ci`, `npm run ci:portable`, `node scripts/check-repository.mjs` and `node scripts/smoke-web.mjs`. On Windows also run `npm run ci:verification`. Verify tracked files are unchanged and no unexpected untracked output remains. Review dependency audit and CodeQL results. A successful scan is not a security certification.
 
-The authoritative project version is the root `package.json`.
+## One-time 0.2.0 preview
 
-## Release checklist
+`publish-preview.yml` is restricted to a successful CI **push run on this repository's master branch**. It checks out that exact commit, requires a successful CodeQL push run for the same SHA, and publishes only version 0.2.0 as a prerelease. It never consumes PR artifacts, installs packages with write credentials, overwrites an existing release, or replaces an existing tag.
 
-1. Update `CHANGELOG.md`.
-2. Confirm the root version is the intended release version.
-3. Run portable checks from a clean checkout:
-   ```bash
-   npm ci
-   npm test
-   npm run typecheck
-   npm run build
-   ```
-4. On Windows, run the full deterministic verification suite:
-   ```powershell
-   npm run ci:verification
-   ```
-5. Confirm no tracked files changed as a side effect of verification:
-   ```bash
-   git diff --exit-code
-   ```
-6. Review dependency/security workflow results.
-7. Create a signed or GitHub-verified tag when possible using `v<version>`.
-8. Publish release notes that separate:
-   - deterministic behavior;
-   - provider-backed/live behavior;
-   - experimental behavior;
-   - known limitations.
-9. Verify the release tag passes the release-gate workflow.
+The publisher attaches a source ZIP, `SHA256SUMS` and `validation.json` with the exact commit and CI/scan URLs. Its token has write permission only in the publisher job. This record is not a signed SLSA attestation. No npm package is published.
 
-## Release evidence
+GitHub-token-created tags/releases do not recursively start the tag workflow. The bootstrap preview is gated by the already completed full CI plus the exact-commit CodeQL check, not by an invented second tag run.
 
-Release notes should identify the commit and the deterministic checks used. Do not claim that a provider-backed run occurred unless the corresponding evidence exists.
+## Subsequent releases
 
-## Security releases
+1. Update the root version, lockfile metadata and changelog consistently.
+2. Complete the validation above and review the final PR.
+3. Create a signed or verified tag where supported, matching `v<version>`.
+4. Confirm the tag-triggered Release Gate or an explicitly selected manual release-gate run passes.
+5. Publish reviewed notes and exact-commit evidence; mark experimental releases as previews.
 
-For a security fix:
+The bootstrap workflow intentionally does not publish later versions automatically. Never force-update a released tag or overwrite an asset with different bytes. Correct defects through a new version and clear advisory notes.
 
-- coordinate disclosure according to `SECURITY.md`;
-- add a regression test when feasible;
-- avoid publishing exploit-enabling detail before users can update;
-- document affected versions and mitigation clearly.
+## Security and rollback
 
-## Rollback
-
-If a release produces a false `VERIFIED` condition, evidence corruption, or a material trust-boundary regression, treat it as a priority defect. Publish a corrective release or mark the affected release as unsafe as soon as the impact is confirmed.
+Follow [SECURITY.md](../SECURITY.md). A false acceptance, evidence corruption or material trust-boundary regression is a priority defect. Add a regression, identify the affected version and mitigation, and publish a corrective version. Do not claim that checks unavailable due to repository configuration were executed successfully.

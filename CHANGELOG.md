@@ -1,62 +1,35 @@
 # Changelog
 
-All notable changes to BURHAN will be documented in this file.
+## Unreleased
 
-The project aims to follow [Semantic Versioning](https://semver.org/) as its public interfaces stabilize.
+## 0.2.0 — OSS preview — 2026-09-20
 
-## [Unreleased]
+### Open-source maintenance
 
-## [0.2.0] - 2026-09-20
+- Added Apache-2.0 licensing and NOTICE.
+- Added contribution, security, governance, support, conduct, roadmap and adopter policies; issue forms, PR template, CODEOWNERS and agent guidance.
+- Reframed the README for ongoing OSS use while preserving historical submission evidence.
+- Added configuration, release, ecosystem and maintainer documentation, plus honest Codex for OSS application drafts.
 
-This release turns BURHAN from a public proof-of-concept repository into a maintained open-source project with explicit project health, security, verification, and release controls.
+### Engineering and validation
 
-### Added
+- Added portable unit/type/build CI on Windows, Linux and macOS using Node 22 and 24.
+- Added a separate Windows-native full deterministic verification job, all-dependency npm auditing, repository hygiene and application-answer validation.
+- Added CodeQL and OpenSSF Scorecard workflows. Dependency graph review is additional when enabled; unavailability is explicit and never disables the mandatory npm vulnerability gate.
+- Fixed Next.js-generated type/configuration changes that caused otherwise successful builds to fail clean-tree checks.
+- Added nine built-production HTTP smoke checks and 22 local API regression tests.
+- Added a restricted one-time preview publisher with exact-commit CI/scan evidence, source archive and checksums.
+- Removed the temporary force-upgrade/write-back workflow after dependency remediation; ongoing updates use reviewed changes.
 
-- Apache-2.0 open-source licensing and NOTICE.
-- Contributor, security, governance, support, code-of-conduct, and roadmap policies.
-- Maintainer, release, configuration, ecosystem, adopter, and coding-agent guidance.
-- GitHub issue forms, pull-request template, and CODEOWNERS.
-- Dependabot configuration for npm and GitHub Actions.
-- Multi-platform CI across Windows, Linux, and macOS with Node.js 20 and 22.
-- Windows-native full deterministic verification as an independent CI job.
-- CodeQL analysis, dependency review, OpenSSF Scorecard monitoring, and production dependency auditing.
-- Evidence-first release-gate automation.
-- Safe environment-variable template and explicit provider credential boundaries.
-- Documentation for deterministic evaluation cases and reference examples.
-- A public adopter registry that records only opt-in, verifiable usage.
+### Security and compatibility
 
-### Changed
+- Bound the demo to loopback; added Host/Origin validation, streamed request-size limits, task limits, body-read timeout and per-process concurrency gates.
+- Disabled live HTTP compilation by default; explicit local opt-in and a provider key are required.
+- Resolved the monorepo root for compilation and sanitized reset failures.
+- Upgraded the web stack to Next.js 16.3.5 and React/React DOM 19.3.0; updated Vitest to 4.1.11 and pinned third-party Actions by commit SHA.
+- Use Node 22 or 24. The package compatibility floor remains 20.9; that older line is not covered by the current CI matrix.
+- Full reference execution remains Windows-native. `local_trusted` is not a sandbox, formal proof or external attestation.
 
-- Reframed the README from a one-time submission artifact into an ongoing open-source project while preserving historical submission material for provenance.
-- Raised the supported Node.js floor to 20.9 to match the maintained web framework baseline.
-- Upgraded the web stack to Next.js 16.3.5, React 19.3.0, and React DOM 19.3.0.
-- Kept Webpack explicit for the web application while its custom extension alias is required.
-- Upgraded Vitest to 4.1.11 across test workspaces.
-- Added project/package metadata for license, repository, issues, homepage, and ecosystem keywords.
+## 0.1.0 — initial public prototype — 2026-07-21
 
-### Security
-
-- Removed the dependency vulnerabilities found by the new audit gate during OSS hardening.
-- Pinned third-party GitHub Actions to immutable commit SHAs.
-- Added CodeQL, dependency review, and OpenSSF Scorecard workflows.
-- Documented private vulnerability reporting and the limits of the current `local_trusted` execution mode.
-
-### Compatibility
-
-- Portable unit/type/build checks are exercised on Windows, Linux, and macOS.
-- The complete deterministic reference verification path remains Windows-native in 0.2.0; cross-platform equivalence remains on the roadmap.
-
-## [0.1.0] - 2026-07-21
-
-Initial public proof-of-concept:
-
-- bounded `ProofContract` workflow;
-- deterministic validator compilation and qualification;
-- separate coding-agent execution;
-- candidate patch capture;
-- fresh-workspace verification;
-- evidence-backed verdict reduction;
-- linked local-artifact integrity receipts;
-- payment-idempotency demonstration and evaluation fixtures.
-
-The 0.1.0 repository state was created as a public demonstration. Historical submission-oriented documentation remains in `docs/` for transparency.
+Introduced bounded ProofContracts, deterministic validator compilation/qualification, separate agent execution, candidate capture, fresh-workspace verification, evidence-backed verdicts, linked local receipts and the payment-idempotency demonstration. Historical live rejection and deterministic repair are separately disclosed in the retained documentation.

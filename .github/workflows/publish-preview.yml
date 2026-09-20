@@ -1,0 +1,107 @@
+name: Publish validated 0.2.0 preview
+
+# Only the completed CI of a same-repository push to master can publish.
+# No pull-request artifacts or pull-request code are executed with this token.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-burhan-0-2-0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'gjt21123/BURHAN' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    env:
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+      VERIFIED_CI_URL: ${{ github.event.workflow_run.html_url }}
+    steps:
+      - name: Checkout exactly the verified master commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+      - name: Verify scan and publish once without replacing existing tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          version="$(node -p "require('./package.json').version")"
+          if [ "$version" != '0.2.0' ]; then
+            echo 'This bootstrap publisher only handles the reviewed 0.2.0 preview.'
+            exit 0
+          fi
+          tag="v$version"
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate --jq '.[].tag_name' > "$RUNNER_TEMP/release-tags"
+          if grep -Fxq "$tag" "$RUNNER_TEMP/release-tags"; then
+            echo 'Existing preview preserved; no assets or tags were overwritten.'
+            exit 0
+          fi
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            echo 'Refusing to publish over an existing tag without an existing release.' >&2
+            exit 1
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$SOURCE_SHA&event=push&per_page=100" > "$RUNNER_TEMP/scan-runs.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const runs = JSON.parse(readFileSync(`${process.env.RUNNER_TEMP}/scan-runs.json`, 'utf8')).workflow_runs;
+          const scan = runs.find(run => run.name === 'CodeQL' && run.head_sha === process.env.SOURCE_SHA && run.status === 'completed' && run.conclusion === 'success');
+          if (!scan) throw new Error('A completed successful CodeQL workflow for this exact commit is required; review/rerun publication after it finishes.');
+          appendFileSync(process.env.GITHUB_ENV, `VERIFIED_SCAN_URL=${scan.html_url}\n`);
+          NODE
+          mkdir -p "$RUNNER_TEMP/burhan-release"
+          git archive --format=zip --prefix="BURHAN-$version/" HEAD > "$RUNNER_TEMP/burhan-release/BURHAN-$version-source.zip"
+          cp docs/releases/v0.2.0.md "$RUNNER_TEMP/burhan-release/notes.md"
+          printf '\n## Exact validation evidence\n\nCommit: `%s`\n\nCI: %s\n' "$SOURCE_SHA" "$VERIFIED_CI_URL" >> "$RUNNER_TEMP/burhan-release/notes.md"
+      - name: Attach reproducible source checksums and validation metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f "$RUNNER_TEMP/burhan-release/BURHAN-0.2.0-source.zip" ]; then exit 0; fi
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
+          const dir = `${process.env.RUNNER_TEMP}/burhan-release`;
+          const file = 'BURHAN-0.2.0-source.zip';
+          const sha256 = createHash('sha256').update(readFileSync(`${dir}/${file}`)).digest('hex');
+          writeFileSync(`${dir}/SHA256SUMS`, `${sha256}  ${file}\n`);
+          writeFileSync(`${dir}/validation.json`, JSON.stringify({
+            schemaVersion: 1, version: '0.2.0', releaseKind: 'preview', commit: process.env.SOURCE_SHA,
+            sourceArchive: { file, sha256 }, ciRun: process.env.VERIFIED_CI_URL, codeqlRun: process.env.VERIFIED_SCAN_URL,
+            scope: 'Source archive linked to GitHub CI and scan execution; not a security certification or SLSA attestation.',
+            fullReferenceVerification: 'Windows / Node 22', portableMatrix: 'Linux, macOS, Windows / Node 22 and 24',
+            liveProviderCallsRequested: false
+          }, null, 2) + '\n');
+          appendFileSync(`${dir}/notes.md`, `\nCodeQL workflow: ${process.env.VERIFIED_SCAN_URL}\n\nChecksums identify the source archive; they are not an independent certification.\n`);
+          NODE
+          gh release create v0.2.0 \
+            "$RUNNER_TEMP/burhan-release/BURHAN-0.2.0-source.zip" \
+            "$RUNNER_TEMP/burhan-release/SHA256SUMS" \
+            "$RUNNER_TEMP/burhan-release/validation.json" \
+            --repo "$GITHUB_REPOSITORY" --target "$SOURCE_SHA" \
+            --title 'BURHAN 0.2.0 — OSS preview' --prerelease --latest=false \
+            --notes-file "$RUNNER_TEMP/burhan-release/notes.md"

@@ -1,74 +1,39 @@
-# Maintainer Guide
+# Maintainer guide
 
-This guide describes ongoing maintenance work for BURHAN. It is deliberately operational: maintenance signals should come from real work, not manufactured activity.
+Maintenance signals must come from real work, not manufactured activity.
 
-## Triage
+## Triage and review
 
-For each new issue:
+Reproduce reports, identify the component and trust boundary, distinguish deterministic behavior from provider behavior, and classify false acceptance, false rejection, incomplete evidence and documentation mismatches. Request sanitized minimal reproductions. Security reports follow [SECURITY.md](../SECURITY.md), not public exploit discussions.
 
-1. reproduce or clarify the report;
-2. identify the affected component and assurance boundary;
-3. distinguish deterministic BURHAN behavior from provider/API behavior;
-4. classify whether the failure can cause a false accept, false reject, incomplete result, or documentation mismatch;
-5. request a minimal reproduction with secrets removed;
-6. link the issue to a pull request or roadmap item when action is planned.
+Review whether the candidate can influence protected evidence, whether positive/negative controls are sufficient, whether missing evidence fails closed, and whether claims match actual assurance. CI is evidence, not independent review or a security certificate.
 
-Security reports follow `SECURITY.md` and should not be triaged publicly when disclosure would increase risk.
+## Dependencies
 
-## Pull-request review
+Dependabot covers npm and Actions. Review runtime changes, transitive risk, Action pinning, provider compatibility and Node.js 22/24 behavior. All-dependency npm audit is mandatory. The GitHub dependency-graph comparison is additional when the repository feature is enabled; its absence must remain visible.
 
-A review should answer:
+The temporary force-upgrade/write-back workflow was removed after remediation. Do not reintroduce unattended `npm audit fix --force` or write-capable execution of untrusted PR code. Keep changes reviewed and preserve the lockfile.
 
-- Does the change preserve independent verdict ownership?
-- Can untrusted candidate output write or influence protected evidence?
-- Are positive and negative controls sufficient?
-- Are failures explicit and fail closed?
-- Is provider-specific behavior isolated from deterministic verification?
-- Does documentation describe the actual assurance precisely?
-- Are new dependencies necessary and appropriately scoped?
+## Repository settings to verify separately
 
-CI is evidence, not a substitute for review.
+Files and workflows do not enable administrative controls automatically. An owner should inspect repository settings for:
 
-## Dependency maintenance
+- Dependency graph and Dependabot alerts, so the additional graph review becomes available.
+- Private vulnerability reporting; verify the reporting route before advertising it as active.
+- Branch protection/rulesets requiring CI and CodeQL, no force-pushes and review appropriate to the maintainer model. CODEOWNERS alone does not enforce reviews.
+- Repository description and topics; package metadata does not populate the GitHub About panel.
 
-Dependabot is configured for npm and GitHub Actions updates. Dependency pull requests should be reviewed for:
+Suggested description: `Independent, evidence-first verification for bounded coding-agent work.`
+Suggested topics: `ai-agents`, `codex`, `software-verification`, `agentic-coding`, `typescript`, `developer-tools`.
 
-- runtime behavior changes;
-- transitive security impact;
-- action provenance/pinning;
-- changes to provider SDK behavior;
-- compatibility with Node.js 20+.
+Record configuration limitations as maintainer tasks rather than presenting unsupported checks as passed. Do not publish credentials or request a broad personal access token in an issue.
 
-## Release management
+## Releases
 
-Follow `docs/release-process.md`. Every release should have:
+Follow the [release process](release-process.md). Releases need clean deterministic checks, explicit version/commit identity, accurate notes and documented assurance limits. The 0.2.0 bootstrap publisher is deliberately restricted to a validated master commit and creates a preview, never a stable npm release.
 
-- a clean deterministic verification run;
-- a changelog entry;
-- a version/tag consistency check;
-- documented breaking or assurance-boundary changes;
-- security fixes called out without prematurely exposing exploit details.
+## Claims and adoption
 
-## Claims discipline
+Use “local artifact integrity” rather than external attestation, “deterministic verification” rather than formal proof, and `local_trusted` with its limits rather than sandbox. Record only consented, verifiable use in [ADOPTERS.md](../ADOPTERS.md).
 
-Avoid terms such as "secure", "proved", "sandboxed", or "tamper-proof" unless the exact scope is defined and supported by evidence.
-
-Prefer:
-
-- "local artifact integrity" over "attestation" when no external attestation exists;
-- "deterministic verification" over "proof" where the system executes tests/checks;
-- "local_trusted" with its documented limitations over "sandbox".
-
-## Community health
-
-Meaningful project-health signals include:
-
-- external bug reports and feature requests;
-- reproducible issues;
-- reviewed pull requests;
-- releases tied to real changes;
-- adopter references;
-- compatibility requests;
-- security reports handled responsibly.
-
-Do not create synthetic issues, stars, forks, or adoption claims to inflate project metrics.
+Maintainer-directed automated changes, test fixtures and roadmap issues are not external users, independent reviewers or community adoption. A prepared application pack does not establish program acceptance.

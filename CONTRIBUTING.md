@@ -1,102 +1,64 @@
 # Contributing to BURHAN
 
-Thank you for helping improve BURHAN.
+BURHAN evaluates agent-authored changes. Contributions must preserve independent acceptance, reproducible evidence, explicit trust boundaries and fail-closed behavior.
 
-BURHAN sits on a trust boundary: it evaluates coding-agent work and produces evidence that humans may use to make decisions. Contributions therefore need to preserve **independence, reproducibility, explicit trust boundaries, and fail-closed behavior**.
+Read the [README](README.md), [architecture](docs/architecture.md), [threat model](docs/threat-model.md), [governance](GOVERNANCE.md) and [security policy](SECURITY.md). For a non-trivial change, describe the problem, affected trust boundary and proposed tests in an issue before broad refactoring. Coding agents also follow [AGENTS.md](AGENTS.md).
 
-## Before you start
+## Setup
 
-Please read:
-
-- [README.md](README.md)
-- [Architecture](docs/architecture.md)
-- [Threat model](docs/threat-model.md)
-- [Governance](GOVERNANCE.md)
-- [Security policy](SECURITY.md)
-
-For non-trivial changes, open an issue first and describe the problem, proposed behavior, trust-boundary impact, and how the change will be tested.
-
-## Development setup
-
-Requirements:
-
-- Node.js 20.9 or newer
-- npm
-- Git
-- Windows is the currently validated primary execution environment; portability work is welcome.
-
-Install and start:
+Use Git, npm and Node.js 22 or 24:
 
 ```bash
 npm ci
 npm run dev
 ```
 
-## Required checks
+Visit `http://127.0.0.1:3000`. Do not configure an API key for ordinary development or deterministic validation. Live provider-backed evaluations are separate, optional and may incur costs.
 
-Before opening a pull request, run:
+## Required validation
+
+Portable checks on Windows, Linux or macOS:
 
 ```bash
-npm test
-npm run typecheck
-npm run build
-npm run eval:burhan
-npm run eval:compiler:fixtures
-npm run eval:codex:fixtures
-npm run eval:validator-qualification
-npm run eval:executor:fixtures
-npm run eval:execution-verification
-npm run eval:architect-output
-npm run eval:repair-loop
-npm run eval:repair-orchestration
-npm run eval:submission-demo
+npm run ci:portable
+node scripts/check-repository.mjs
+node scripts/smoke-web.mjs
 git diff --check
+git diff --exit-code
 ```
 
-Provider-backed/live checks are intentionally separate from deterministic CI. A pull request must not require maintainer credentials or external model quota to prove its deterministic correctness.
+Run the smoke script after the production build included in `ci:portable`. It starts and stops a local server, exercises safe API behavior and leaves live compilation disabled. Next.js type declarations are generated and ignored; do not commit `apps/web/next-env.d.ts`.
 
-## Pull request expectations
+The complete reference execution/verification path remains Windows-native:
 
-A strong PR:
-
-1. states the user or maintainer problem;
-2. identifies any affected trust boundary;
-3. explains failure modes and rollback behavior;
-4. includes deterministic tests or fixtures;
-5. updates documentation when public behavior changes;
-6. avoids unrelated refactors;
-7. does not include credentials, private reasoning, raw provider streams, hidden validator source, or protected artifacts.
-
-Security-sensitive changes should include a short threat-model note in the PR body.
-
-## Verification principles
-
-Changes to verification logic should preserve these rules:
-
-- Agent-authored claims are untrusted input.
-- Verdicts must come from BURHAN-controlled evidence.
-- Validators must be qualified against positive and negative controls.
-- Protected artifacts must not be writable by the candidate.
-- Verification should occur in a fresh workspace when the workflow claims independence.
-- Ambiguous or incomplete evidence should fail closed.
-- Claims in UI/docs must match the actual assurance level.
-
-## Commit and branch hygiene
-
-Use focused commits with imperative messages, for example:
-
-```text
-verifier: reject mutable sealed-contract inputs
-docs: clarify local artifact integrity boundary
-test: add negative control for protected-path writes
+```powershell
+npm run ci:verification
 ```
 
-Do not commit generated build output, local credentials, or machine-specific state.
+Contributors on other operating systems should run the portable checks and inspect the Windows CI job, not claim that the full reference path ran locally. No maintainer credentials or external model quota are needed for these gates.
 
-## Licensing
+## Verification changes
 
-By submitting a contribution, you agree that your contribution is intentionally submitted for inclusion in BURHAN under the [Apache License 2.0](LICENSE), unless you explicitly state otherwise before the contribution is accepted.
+Preserve these invariants:
 
-## Reporting vulnerabilities
+- Agent-authored code, tests, explanations and completion claims remain untrusted.
+- Qualified validator packs and sealed contracts cannot be redefined by the candidate.
+- BURHAN-owned evidence determines acceptance in a fresh workspace.
+- Missing, contradictory or unverifiable evidence fails closed.
+- UI and documentation must not claim stronger assurance than the implementation.
 
-Do not disclose a suspected vulnerability in a public issue. Follow [SECURITY.md](SECURITY.md).
+Include a positive control, a negative control that must fail, and a regression for the reported failure. Describe protected-path/evidence impact and rollback behavior. Do not weaken validators or skip failing tests to obtain a green check.
+
+## Pull requests
+
+State the problem, implementation, affected trust boundaries, exact commands run, observed results and known limitations. Distinguish local results from CI results and live-provider execution from deterministic fixtures. Keep changes focused and update relevant documentation.
+
+Automated or maintainer-authored work must not be presented as independent review, external adoption or a new human contributor. Do not fabricate issues, users, benchmarks, stars or usage metrics.
+
+## Hygiene and licensing
+
+Never commit keys, credentials, private reasoning, raw provider streams, hidden validator source in public evidence, generated run directories or machine-specific state. Conservative repository checks are not a substitute for reviewing the patch and history for sensitive data.
+
+Use descriptive commits, such as `verifier: reject unsupported evidence` or `test: cover protected-path regression`.
+
+By submitting a contribution, you intentionally submit it for inclusion under [Apache-2.0](LICENSE), unless agreed otherwise before acceptance. Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
