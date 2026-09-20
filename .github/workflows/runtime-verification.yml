@@ -1,0 +1,66 @@
+name: Runtime verification
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reference:
+    name: Runtime reference / ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['22', '24']
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      OPENAI_API_KEY: ''
+      ANTHROPIC_API_KEY: ''
+      CODEX_API_KEY: ''
+      BURHAN_ENABLE_LIVE_COMPILER: '0'
+    steps:
+      - name: Checkout full reference history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Complete deterministic reference suites
+        shell: bash
+        run: |
+          status=0
+          printf '| Reference suite | Result |\n| --- | --- |\n' >> "$GITHUB_STEP_SUMMARY"
+          for suite in eval:burhan eval:compiler:fixtures eval:codex:fixtures eval:validator-qualification eval:executor:fixtures eval:execution-verification eval:architect-output eval:repair-loop eval:repair-orchestration eval:submission-demo; do
+            echo "::group::$suite"
+            if npm run "$suite"; then
+              printf '| `%s` | PASS |\n' "$suite" >> "$GITHUB_STEP_SUMMARY"
+            else
+              printf '| `%s` | FAIL |\n' "$suite" >> "$GITHUB_STEP_SUMMARY"
+              status=1
+            fi
+            echo '::endgroup::'
+          done
+          exit "$status"
+      - name: Preserve source cleanliness
+        shell: bash
+        run: |
+          git diff --exit-code
+          test -z "$(git ls-files --others --exclude-standard)"

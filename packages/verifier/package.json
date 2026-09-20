@@ -5,7 +5,7 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run && node --import tsx --test tests/runtime-runner.node.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
