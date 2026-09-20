@@ -1,7 +1,27 @@
 {
   "name": "burhan",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "description": "Independent, evidence-first verification plane for bounded coding-agent work.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gjt21123/BURHAN.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gjt21123/BURHAN/issues"
+  },
+  "homepage": "https://github.com/gjt21123/BURHAN#readme",
+  "keywords": [
+    "ai-agents",
+    "coding-agents",
+    "codex",
+    "verification",
+    "software-verification",
+    "agentic-coding",
+    "evidence",
+    "typescript"
+  ],
   "workspaces": [
     "apps/*",
     "packages/*",
@@ -12,6 +32,9 @@
     "build": "npm run build --workspace @burhan/web",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "ci:portable": "npm test && npm run typecheck && npm run build",
+    "ci:verification": "npm run eval:burhan && npm run eval:compiler:fixtures && npm run eval:codex:fixtures && npm run eval:validator-qualification && npm run eval:executor:fixtures && npm run eval:execution-verification && npm run eval:architect-output && npm run eval:repair-loop && npm run eval:repair-orchestration && npm run eval:submission-demo",
+    "security:audit": "npm audit --omit=dev --audit-level=high",
     "eval:burhan": "npm run eval --workspace @burhan/cli",
     "eval:compiler:fixtures": "npm run eval:fixtures --workspace @burhan/specforge",
     "eval:compiler:live": "npm run eval:live --workspace @burhan/specforge",
@@ -38,6 +61,6 @@
     "tsx": "^4.19.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.9.0"
   }
 }

@@ -1,0 +1,64 @@
+name: Verification discrepancy
+description: Report evidence or verdict behavior that may violate BURHAN's assurance model.
+title: "[Verification]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If this could be a security vulnerability, stop and follow SECURITY.md instead of opening a public issue.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true
+
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Observed verdict
+      options:
+        - VERIFIED
+        - REJECTED
+        - INCOMPLETE / blocked
+        - No verdict
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: contract
+    attributes:
+      label: Bounded requirement / contract
+      description: Provide the smallest non-sensitive contract or requirement needed to understand the discrepancy.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence mismatch
+      description: Which evidence, validator, receipt, or protected-path behavior appears inconsistent?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide deterministic steps where possible.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: disclosure
+    attributes:
+      label: Safety check
+      options:
+        - label: This report does not contain an undisclosed vulnerability or exploit requiring private handling.
+          required: true
+        - label: I removed secrets and private provider data.
+          required: true

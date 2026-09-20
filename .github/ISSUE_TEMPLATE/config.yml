@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security policy
+    url: https://github.com/gjt21123/BURHAN/blob/master/SECURITY.md
+    about: Use private reporting for suspected vulnerabilities; do not disclose exploit details publicly.
+  - name: Contributor guide
+    url: https://github.com/gjt21123/BURHAN/blob/master/CONTRIBUTING.md
+    about: Read contribution and verification requirements before proposing substantial changes.
