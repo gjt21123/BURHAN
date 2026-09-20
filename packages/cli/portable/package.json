@@ -1,0 +1,13 @@
+{
+  "name": "@burhan/cli",
+  "version": "0.3.0-preview.1",
+  "description": "Offline, pinned-contract static checks for committed coding-agent changes. Runtime reference verification remains a separate profile.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "bin": { "burhan": "bin/burhan.mjs" },
+  "files": ["bin/", "lib/", "README.md", "LICENSE"],
+  "engines": { "node": ">=22" },
+  "repository": { "type": "git", "url": "git+https://github.com/gjt21123/BURHAN.git", "directory": "packages/cli/portable" },
+  "bugs": { "url": "https://github.com/gjt21123/BURHAN/issues" }
+}

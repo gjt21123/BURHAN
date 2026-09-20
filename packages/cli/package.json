@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "burhan": "tsx src/index.ts",
+    "burhan": "node portable/bin/burhan.mjs",
+    "burhan:legacy": "tsx src/index.ts",
     "eval": "tsx src/index.ts eval",
-    "test": "vitest run --passWithNoTests",
+    "test": "node --test portable/tests/*.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

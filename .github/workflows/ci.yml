@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, 'feat/oss-readiness-*']
+    branches: [master, 'feat/oss-readiness-*', 'feat/portable-cli-*']
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -45,6 +45,8 @@ jobs:
         run: npm ci
       - name: Unit and workspace tests
         run: npm test
+      - name: Offline CLI distribution and independent-repository smoke checks
+        run: npm run test:cli-package
       - name: Typecheck
         run: npm run typecheck
       - name: Build
@@ -57,6 +59,13 @@ jobs:
         run: |
           git diff --exit-code
           test -z "$(git ls-files --others --exclude-standard)"
+      - name: Preserve tested CLI tarball and validation metadata
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: burhan-cli-${{ matrix.os }}-node${{ matrix.node }}
+          path: reports/cli-distribution/
+          if-no-files-found: error
+          retention-days: 14
 
   windows-verification:
     name: Full deterministic verification / Windows / Node 22

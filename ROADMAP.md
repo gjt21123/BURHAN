@@ -2,12 +2,25 @@
 
 This roadmap describes intended directions, not promises or deadlines. Work is accepted when it preserves BURHAN's trust model and can be evaluated with deterministic evidence.
 
+## Phase A implementation record
+
+The first increment is the [portable static CLI preview](docs/portable-cli.md), tracked in issue #9. It provides independently pinned contracts, immutable Git snapshot checks and an offline-tested tarball without BURHAN milestone dependencies. This is not the complete runtime-verifier portability milestone. Automated independent repositories are fixtures, not external adopters.
+
+- [x] Implement a dependency-free static-profile CLI with explicit commands, exit codes and JSON reports.
+- [x] Require full commit IDs and an independently retained contract seal pin.
+- [x] Package the actual CLI with an allowlist and offline installation tests outside the monorepo.
+- [x] Add positive/negative, tampering, path and malformed-input regressions to cross-platform CI.
+- [ ] Generalize the qualified runtime backend and remove Windows-only dependencies from that separate execution path.
+- [ ] Validate real Codex and Claude adapters without mixing live evidence with deterministic fixtures.
+- [ ] Ship a maintainer-pinned GitHub Actions reference integration after runtime boundaries are reviewed.
+- [ ] Establish real external use and meaningful independent contributions; do not count generated fixtures or maintainer-directed automation.
+
 ## Near term — make the core easy to adopt
 
-- [ ] Stable, documented CLI surface for common verification workflows.
-- [ ] Reproducible install and quick-start path from a clean clone.
-- [ ] Cross-platform deterministic test coverage for Windows, Linux, and macOS where the assurance model is equivalent.
-- [ ] Example projects beyond payment idempotency.
+- [ ] Stable, documented CLI surface for common runtime verification workflows; static preview is available separately.
+- [ ] Reproducible general-purpose runtime install and quick-start path from a clean clone.
+- [ ] Cross-platform runtime verification coverage for Windows, Linux, and macOS where the assurance model is equivalent.
+- [ ] Runtime example projects beyond payment idempotency.
 - [ ] Machine-readable evidence schema documentation and compatibility policy.
 - [ ] Versioned releases with changelog and migration notes.
 - [ ] Contributor-friendly issue taxonomy and triage process.

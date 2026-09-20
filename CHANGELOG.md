@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Phase A: portable static CLI distribution (0.3.0-preview.1)
+
+- Add a dependency-free CLI for doctor/init, contract validation and explicit sealing, immutable-commit verification, reports and pinned report-integrity checks.
+- Introduce `static_git_snapshot_v1`: five fixed file predicates plus allowed/forbidden change policies, independent SHA-256 seal pins and full commit IDs. Static PASSED does not imply runtime correctness.
+- Read Git objects without checking out or executing candidate code, running lifecycle scripts, using replacement refs or fetching. Add bounds, portable path checks and strict JSON duplicate-key handling.
+- Add 71 isolated regression tests and actual offline tarball installation on three independent Git fixtures with positive/negative controls in all six CI OS/Node combinations.
+- Preserve tested tarballs, checksums and validation metadata as CI artifacts. No npm registry publication or external adoption is claimed.
+- Route `npm run burhan` to the portable preview; retain historical receipt/eval commands via `npm run burhan:legacy` and unchanged `npm run eval:burhan`.
+- Keep the runtime compiler, qualified validator packs, signed evidence/repair flow and full Windows reference suite unchanged. Runtime portability remains a separate open milestone.
+
 ## 0.2.0 — OSS preview — 2026-09-20
 
 ### Open-source maintenance

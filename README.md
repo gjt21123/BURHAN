@@ -8,6 +8,20 @@
 
 BURHAN separates the agent that changes code from the system that decides whether the task is complete. It treats model drafts, candidate patches, test summaries and completion claims as untrusted input. Acceptance comes from a human-sealed contract, qualified validators and BURHAN-owned evidence produced in a fresh workspace.
 
+## Portable CLI preview: committed-file checks
+
+The new **0.3.0-preview.1 CLI distribution** can inspect independent Git repositories without the payment fixture, BURHAN milestone tags, Next.js or provider credentials. It supports `doctor`, `init`, `contract validate`, `contract seal`, `verify`, `report` and pinned report-integrity checking.
+
+```bash
+# No npm ci is needed for this dependency-free profile.
+node packages/cli/portable/bin/burhan.mjs doctor
+node packages/cli/portable/bin/burhan.mjs --help
+```
+
+Its explicit `static_git_snapshot_v1` profile checks committed file predicates and allowed/forbidden changes against a maintainer-approved, independently pinned contract. **Static PASSED is not runtime correctness**, and dirty/untracked files are not included. It does not execute candidate code or replace the existing qualified runtime verifier.
+
+Read the [CLI installation and command reference](packages/cli/portable/README.md), [milestone evidence and remaining scope](docs/portable-cli.md), and [design decision](docs/adr/portable-static-cli.md). `npm run test:cli-package` packs and installs the real tarball offline outside this monorepo; CI retains the tested package and checksums as artifacts. No npm registry publication or external adoption is claimed.
+
 ## Status and intended use
 
 **0.2.0 is an early-stage OSS preview**, suitable for inspecting and reproducing the reference workflow, contributing tests, and evaluating the approach. It is not a hosted service or a general-purpose production verifier for arbitrary repositories.
@@ -76,7 +90,8 @@ The fixtures include intentionally wrong candidates, protected-path violations a
 | Executor output, candidate patch, completion claim | Untrusted; cannot determine its own verdict |
 | Validator templates and qualification controls | BURHAN-controlled |
 | Sealed contracts, validator packs and receipts | Protected artifacts with integrity checks |
-| Independent verification | Uses captured state in a fresh workspace |
+| Independent runtime verification | Uses captured state in a fresh workspace |
+| Portable static snapshot verification | Reads committed blobs; no runtime-execution claim |
 | Local signatures and hashes | Local artifact integrity, not external certification |
 | Local HTTP API | Loopback/origin/body limits, not authentication or a multi-user service |
 
@@ -92,7 +107,7 @@ Historical GPT compiler disclosures, including unavailable live API quota, remai
 
 ## Validation and maintenance
 
-The CI workflow runs six portable OS/Node combinations, the separate full Windows reference suite, all-dependency npm auditing, repository hygiene and application-file validation. A production HTTP smoke test runs on Linux/Node 22. Tracked changes and unexpected untracked output fail the clean-tree checks.
+The CI workflow runs six portable OS/Node combinations, the separate full Windows reference suite, all-dependency npm auditing, repository hygiene and application-file validation. Each portable job also installs and exercises the standalone CLI tarball offline on independent fixture repositories. A production HTTP smoke test runs on Linux/Node 22. Tracked changes and unexpected untracked output fail the clean-tree checks.
 
 CodeQL analyzes JavaScript/TypeScript. The PR dependency workflow always enforces a complete npm audit and additionally runs GitHub dependency-graph review **when that repository feature is available**. An unavailable graph is reported explicitly, not counted as a successful graph review. OpenSSF Scorecard provides posture information, not certification.
 
@@ -102,7 +117,7 @@ See the [validation record](docs/codex-for-oss/validation.md), [release process]
 
 ```text
 apps/web                         Local demonstration and inspection UI
-packages/cli                     CLI and reference evaluation entry point
+packages/cli                     Portable CLI distribution and legacy evaluation entry point
 packages/core                    Contracts, evidence, receipts and state machine
 packages/specforge               Filtered repository facts and contract compiler
 packages/validator-compiler      Trusted validator templates and sealing
@@ -112,7 +127,7 @@ packages/verifier                Fresh verification and verdict logic
 packages/workspace               Workspace and path-safety utilities
 examples/payment-service         Reference bounded coding task
 evals                            Valid and intentionally invalid candidates
-scripts                          Repository and production HTTP checks
+scripts                          Repository, packaging and production HTTP checks
 docs                             Architecture, usage, maintenance and evidence
 submission-assets                Historical demonstration media
 ```
