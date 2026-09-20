@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -45,7 +45,9 @@ test('nonzero command exit is a functional fail, not infrastructure interruption
 test('executes from the explicitly supplied directory with spaces', async t => {
   const { cwd, temp } = await fixture(t);
   const r = await runLocalCommand(command('process.stdout.write(process.cwd())'), cwd, temp);
-  assert.equal(r.stdout.toString(), cwd); assert.equal(r.exitCode, 0);
+  // macOS /var can resolve to /private/var; compare directory identity, not its alias.
+  assert.equal(await realpath(r.stdout.toString()), await realpath(cwd));
+  assert.equal(r.exitCode, 0);
 });
 test('shell metacharacters and spaces remain literal argument data', async t => {
   const args = ['semi;colon', '$(echo nope)', '&', 'one two', '"quoted"'];

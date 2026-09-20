@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { canonicalJson, sha256, type ProofContract } from "@burhan/core";
 import { createBaselineManifest, createIndependentClone, createRunDirectory } from "@burhan/workspace";
-import { appendEvidence, runWindowsLocalCommand, sealValidatorPack, verifyReceipt, verifyReceiptWithEvidence, verifySealedValidatorPack } from "@burhan/verifier";
+import { appendEvidence, classifyCommandExecution, reduceRuntimeStatuses, runLocalCommand, sealValidatorPack, verifyReceipt, verifyReceiptWithEvidence, verifySealedValidatorPack, type RuntimeCheckStatus } from "@burhan/verifier";
 
 const [command, ...args] = process.argv.slice(2);
 
@@ -28,13 +28,16 @@ async function runEvaluation(): Promise<void> {
   const tamperResult = await evaluateCase("correct", true);
   const accepted = actual.get("correct") === "verified" ? 1 : 0;
   const rejected = [...actual.entries()].filter(([caseId, verdict]) => caseId !== "correct" && verdict === "rejected").length;
+  const falseAccepts = [...actual.entries()].filter(([caseId, verdict]) => caseId !== "correct" && verdict === "verified").length;
+  const incomplete = [...actual.values()].filter(verdict => verdict === "incomplete").length;
   const passed = accepted === 1 && rejected === 4 && tamperResult === "incomplete";
   console.log("BURHAN EVALUATION\n");
   console.log("Functional cases:       5");
   console.log(`Valid accepted:         ${accepted} / 1`);
   console.log(`Invalid rejected:       ${rejected} / 4`);
-  console.log(`False accepts:          ${4 - rejected}`);
-  console.log(`False rejects:          ${1 - accepted}\n`);
+  console.log(`False accepts:          ${falseAccepts}`);
+  console.log(`False rejects:          ${actual.get("correct") === "rejected" ? 1 : 0}`);
+  console.log(`Incomplete cases:       ${incomplete}\n`);
   console.log("Integrity cases:        1");
   console.log(`Tampering detected:     ${tamperResult === "incomplete" ? 1 : 0} / 1\n`);
   console.log("Execution assurance:    LOCAL TRUSTED");
@@ -58,25 +61,31 @@ async function evaluateCase(caseId: string, tamper = false): Promise<string> {
   await writeValidators(packPath);
   const packHash = await sealValidatorPack(packPath, { version: 1, contractHash, baselineCommit, validators: validatorManifest() });
   if (tamper) await writeFile(path.join(packPath, "tests", "out-001.mts"), "throw new Error('tampered');\n");
-  try { await verifySealedValidatorPack(packPath); } catch { return "incomplete"; }
+  try { await verifySealedValidatorPack(packPath, packHash); } catch { return "incomplete"; }
   await run("git", ["apply", path.join(repositoryRoot, "evals", "cases", caseId, "candidate.patch")], workspacePath);
   const after = await createBaselineManifest(workspacePath);
   const policyViolation = detectProtectedChanges(baseline.files, after.files);
+  // Do not execute a candidate already known to violate protected-file policy.
+  if (policyViolation) return "rejected";
   const evidencePath = path.join(runPath, "evidence");
   let previousEvidenceHash: string | null = null;
-  const statuses: Record<string, boolean> = {};
+  const statuses: RuntimeCheckStatus[] = [];
   for (const validator of validatorManifest()) {
+    try { await verifySealedValidatorPack(packPath, packHash); } catch { return "incomplete"; }
     const validatorPath = path.join(packPath, "tests", `${validator.id.toLowerCase()}.mts`);
     const temporaryPath = path.join(workspacePath, ".burhan-tmp");
     await mkdir(temporaryPath, { recursive: true });
-    const execution = await runWindowsLocalCommand({ executableId: "node", args: [path.join(repositoryRoot, "node_modules", "tsx", "dist", "cli.mjs"), validatorPath], timeoutMs: 15_000, maxOutputBytes: 256_000 }, workspacePath, temporaryPath);
-    const status = execution.exitCode === 0 && !execution.timedOut && !execution.outputCapped;
-    statuses[validator.clauseId] = status;
-    const record = await appendEvidence(evidencePath, { id: `${validator.id}-evidence`, runId, clauseId: validator.clauseId, validatorId: validator.id, producer: "burhan-verifier", evidenceClass: "deterministic", assurance: "proven", status: status ? "pass" : execution.timedOut ? "blocked" : "fail", execution: { executable: execution.executable, args: execution.args, exitCode: execution.exitCode, signal: execution.signal, timedOut: execution.timedOut, startedAt: execution.startedAt, completedAt: execution.completedAt } }, previousEvidenceHash);
+    const execution = await runLocalCommand({ executableId: "node", args: [path.join(repositoryRoot, "node_modules", "tsx", "dist", "cli.mjs"), validatorPath], timeoutMs: 15_000, maxOutputBytes: 256_000 }, workspacePath, temporaryPath);
+    const status = classifyCommandExecution(execution);
+    statuses.push(status);
+    const record = await appendEvidence(evidencePath, { id: `${validator.id}-evidence`, runId, clauseId: validator.clauseId, validatorId: validator.id, producer: "burhan-verifier", evidenceClass: "deterministic", assurance: "proven", status, execution: { executable: execution.executable, args: execution.args, exitCode: execution.exitCode, signal: execution.signal, timedOut: execution.timedOut, startedAt: execution.startedAt, completedAt: execution.completedAt } }, previousEvidenceHash);
     previousEvidenceHash = record.evidenceHash;
+    try { await verifySealedValidatorPack(packPath, packHash); } catch { return "incomplete"; }
+    if (status === "blocked") return "incomplete";
   }
-  if (policyViolation) return "rejected";
-  return Object.values(statuses).every(Boolean) ? "verified" : "rejected";
+  const finalState = await createBaselineManifest(workspacePath);
+  if (detectProtectedChanges(baseline.files, finalState.files)) return "rejected";
+  return reduceRuntimeStatuses(statuses);
 }
 
 function contractForEval(): ProofContract {

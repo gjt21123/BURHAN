@@ -11,10 +11,18 @@ export async function sealValidatorPack(packPath: string, manifest: ValidatorPac
   return digest;
 }
 
-export async function verifySealedValidatorPack(packPath: string): Promise<ValidatorPackManifest> {
-  const expectedHash = (await readFile(path.join(packPath, "manifest.sha256"), "utf8")).trim();
+/** Pass the independently retained seal whenever checking an approved runtime pack.
+ * Omitting it preserves legacy sidecar-consistency behavior, not approval identity.
+ */
+export async function verifySealedValidatorPack(packPath: string, expectedPackHash?: string): Promise<ValidatorPackManifest> {
+  if (expectedPackHash !== undefined && !/^sha256:[a-f0-9]{64}$/.test(expectedPackHash)) {
+    throw new Error("Invalid independently retained validator pack hash.");
+  }
+  const sidecarHash = (await readFile(path.join(packPath, "manifest.sha256"), "utf8")).trim();
   const actualHash = sha256(await collectPackBytes(packPath));
-  if (expectedHash !== actualHash) throw new Error("Validator pack mutation detected after sealing.");
+  if (sidecarHash !== actualHash || (expectedPackHash !== undefined && actualHash !== expectedPackHash)) {
+    throw new Error("Validator pack mutation detected after sealing.");
+  }
   return JSON.parse(await readFile(path.join(packPath, "manifest.json"), "utf8")) as ValidatorPackManifest;
 }
 
