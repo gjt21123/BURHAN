@@ -46,6 +46,12 @@ export async function verifyCapturedCandidate(repositoryRoot: string, runId: str
         sha256(canonicalJson(executor.baselineManifest)) !== context.repositoryBaselineHash) return incomplete("REFERENCE_BASELINE_OR_CONTRACT_MISMATCH");
     const before = new Map(executor.baselineManifest.files.map(file => [file.path, file.sha256]));
     const after = new Map(candidate.afterManifest.files.map(file => [file.path, file.sha256]));
+    // The measured store is verifier-owned. Do not silently accept changes to
+    // the real reference storage module that this service-only profile does not
+    // execute. A broader store adapter needs its own qualified observations.
+    if (!before.has("src/payment-store.ts") || before.get("src/payment-store.ts") !== after.get("src/payment-store.ts")) {
+      return incomplete("REFERENCE_STORE_CHANGE_UNSUPPORTED");
+    }
     const changed = [...new Set([...before.keys(), ...after.keys()])].filter(file => before.get(file) !== after.get(file));
     if (candidate.forbiddenChanges.length || changed.some(file => !allowedReferenceChange(file, context))) {
       return { ...base(), verdict: "rejected", forbiddenDetected: true };
