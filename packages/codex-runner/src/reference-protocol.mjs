@@ -50,7 +50,7 @@ export async function readBoundedFile(filename, maxBytes = 1024 * 1024) {
 
 export async function snapshotReference(root) {
   const files = [];
-  let size = 0;
+  let size = 0, visitedEntries = 0;
   async function visit(directory, prefix = '', depth = 0) {
     if (depth > 32) throw new Error('REFERENCE_TREE_LIMIT');
     const entries = await readdir(directory, { withFileTypes: true });
@@ -58,6 +58,7 @@ export async function snapshotReference(root) {
     entries.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
     for (const entry of entries) {
       if (!prefix && entry.name === '.git') continue;
+      if (++visitedEntries > 4096) throw new Error('REFERENCE_TREE_LIMIT');
       const relative = prefix + entry.name;
       relativeReferencePath(relative);
       const full = path.join(directory, entry.name);

@@ -23,7 +23,7 @@ try {
   // Consume the run challenge before importing the subject. It is never in argv,
   // environment, a candidate file, or a retained report/qualification artifact.
   await unlink(filename);
-} catch { process.exitCode = 2; }
+} catch { request = null; process.exitCode = 2; }
 
 if (request) {
   const { nonce, modulePath, exportName, amount, sequential } = request;

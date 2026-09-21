@@ -1,10 +1,12 @@
 # Runtime portability: command backend and reference suite
 
-## Delivered increment
+## Delivered increments
 
-Phase B introduces `runLocalCommand` in `packages/verifier/src/runner.ts` and exercises the ten existing deterministic reference suites on Linux, macOS and Windows with Node.js 22 and 24. The old `runWindowsLocalCommand` export remains an alias, so existing callers do not silently lose their execution path.
+Phase B introduced `runLocalCommand` in `packages/verifier/src/runner.ts` and exercises the ten deterministic reference suites on Linux, macOS and Windows with Node.js 22 and 24. The old `runWindowsLocalCommand` export remains an alias. [PR #12](https://github.com/gjt21123/BURHAN/pull/12) records the original command/reference portability delivery.
 
-This is **not completion of the general-purpose runtime milestone**. The standalone `static_git_snapshot_v1` CLI still checks committed blobs only. The runtime reference workflow still uses BURHAN's payment fixture and historical baseline. Neither a passing reference suite nor this backend makes arbitrary repositories ready for unattended execution.
+The subsequent [bounded candidate-reference increment](bounded-reference-runtime.md), tracked in [PR #17](https://github.com/gjt21123/BURHAN/pull/17), migrates `packages/codex-runner/src/execution.ts` away from in-process candidate imports. That reference path now uses a supervised worker, qualified observations, parent-owned comparisons and independently pinned compiler-pack checks.
+
+Neither increment completes general-purpose runtime orchestration. The standalone `static_git_snapshot_v1` CLI still checks committed blobs only. The runtime reference workflow still uses BURHAN's payment fixture and historical baseline. Passing reference suites do not make arbitrary repositories ready for unattended execution.
 
 ## Execution boundary
 
@@ -12,7 +14,7 @@ Only maintainer-approved `ValidatorCommand` objects may enter the backend. Node 
 
 The child environment is constructed from an allowlist. Provider credentials, inherited `NODE_OPTIONS`, `NODE_PATH`, Git overrides and loader injection variables are not copied. HOME, USERPROFILE, temporary directories and npm cache point to the supplied run directory. npm defaults to offline mode with lifecycle scripts disabled. These defaults do not enforce network isolation against arbitrary local code or explicitly overridden command arguments.
 
-Command limits: 256 arguments, 64 KiB total argument data, no NUL bytes, an execution deadline between 1 ms and 300 seconds, and a combined stdout/stderr budget of at most 16 MiB. Working/temp directories must be absolute and exist. Command-specific limits are normally much lower.
+Command limits: 256 arguments, 64 KiB total argument data, no NUL bytes, an execution deadline between 1 ms and 300 seconds, and a combined stdout/stderr budget of at most 16 MiB. Working/temp directories must be absolute and exist. The candidate reference profile selects narrower limits: at most 10 seconds per probe and 64 KiB combined output.
 
 ### Cancellation and cleanup
 
@@ -20,7 +22,7 @@ On POSIX, a verifier-owned supervisor starts a process group. On Windows, the su
 
 `cleanupSucceeded` reports the outcome of the bounded cleanup procedure, **not an exhaustive process census or malware-containment guarantee**. The tests check ordinary descendants while the command tree is live. Deliberately detached/reparented processes, compromised hosts, parent crashes and Windows native Job Object containment are outside the guarantee. Do not expose unreviewed code to valuable credentials or a production host.
 
-The supervisor protocol is fixed verifier code. It is not formed by interpolating candidate arguments into a shell. Candidate stdout cannot become a supervisor result message.
+The supervisor protocol is fixed verifier code. It is not formed by interpolating candidate arguments into a shell. Candidate stdout cannot become a supervisor result message. The higher-level reference worker additionally requires a complete challenge-bound measurement frame; a zero process exit alone is not acceptance.
 
 ## Result semantics
 
@@ -34,13 +36,16 @@ The supervisor protocol is fixed verifier code. It is not formed by interpolatin
 | Complete checks including a functional failure | `rejected` |
 | Empty, unknown, missing or blocked checks | `incomplete` |
 
-The legacy `eval:burhan` command uses these functions. Its report counts incomplete cases separately rather than describing every non-rejection as a false acceptance. Known protected-path violations are rejected before running validators, and protected files are checked again after execution.
+The legacy `eval:burhan` command uses these functions and counts incomplete cases separately. The bounded candidate reference path also uses this reducer after parent-side observation comparisons. Known protected-path violations are rejected before running candidates. Workspace/pack changes or missing protocol evidence cannot be silently accepted.
 
 ## Independently retained pack identity
 
-`verifySealedValidatorPack(packPath, expectedPackHash)` optionally accepts the original separately retained `sha256:...` seal. The legacy command-based evaluator now supplies its retained hash before and after each validator. Recalculating a modified pack's adjacent sidecar is insufficient to pass that pinned check.
+Two private APIs serve historical paths:
 
-The one-argument API remains compatible with historical callers and checks sidecar consistency only. Existing serialized pack hashes and receipt formats have not been replaced. This change applies to `packages/verifier`'s legacy pack API, not an assertion that every pack implementation now has the same API. It does not stop temporary mutations on a compromised shared host or establish signer identity.
+- `packages/verifier`: `verifySealedValidatorPack(packPath, expectedPackHash)` checks the legacy command evaluator's retained identity around execution.
+- `packages/validator-compiler`: `verifyTrustedValidatorPack(packPath, expectedPackHash)` checks the bounded reference path's retained compiler-pack identity and manifest/file size/hash bindings.
+
+Their one-argument forms preserve legacy consistency checking; an adjacent sidecar alone is not approval. Existing serialized hashes and receipt formats are retained. A matching local hash does not prove signer identity, prevent transient shared-host mutation or establish external attestation.
 
 ## Validation
 
@@ -53,16 +58,16 @@ npm run ci:verification
 npm run test:cli-package
 ```
 
-The complete reference command is now exercised by the dedicated [Runtime verification workflow](../.github/workflows/runtime-verification.yml) on six OS/Node combinations. The normal CI continues to run the static CLI package checks, web checks, dependency audit and repository hygiene. The original Windows reference job is retained rather than removed to obtain a green matrix.
+The [Runtime verification workflow](../.github/workflows/runtime-verification.yml) runs the ten reference suites in six OS/Node combinations. Normal CI continues static CLI package tests, web checks, dependency audit and repository hygiene. The original Windows reference job is retained.
 
-New tests comprise 31 process-backend regressions plus nine pack-pin/verdict regressions. The initial macOS job exposed a test assertion comparing `/var` with the same physical directory under `/private/var`; the assertion now compares canonical directory identities, without skipping the test or weakening the runtime boundary.
+The command-backend increment added 31 process tests plus nine legacy pack/verdict regressions. Its macOS cwd test compares canonical directory identities rather than skipping `/var` versus `/private/var` aliases. The candidate-reference increment adds protocol/worker, runtime orchestration and compiler-pack tests described in [its validation scope](bounded-reference-runtime.md).
 
-See [PR #12](https://github.com/gjt21123/BURHAN/pull/12) for final SHA-specific CI and runtime results. Local validation covered the isolated 31-test process suite on Linux/Node 22; complete repository validation runs on GitHub-hosted CI. No new live model invocation is implied by fixture success.
+Consult each PR for its final tested commit and post-merge runs. Local checks do not substitute for the complete GitHub-hosted matrix, and deterministic fixture success is not new live model evidence.
 
 ## Remaining work before external runtime pilots
 
-[Issue #11](https://github.com/gjt21123/BURHAN/issues/11) remains open for explicit external repository/base/head/contract inputs, portable fresh workspace construction, general validator/qualification inputs and multiple independent runtime examples.
+[Issue #11](https://github.com/gjt21123/BURHAN/issues/11) remains open for explicit external repository/base/head/contract inputs, portable parent-owned capture and workspace construction, general validator/qualification inputs and multiple independent runtime examples.
 
-The existing `packages/codex-runner/src/execution.ts` reference path still imports fixture candidate modules into its own process. It is **not automatically supervised by the new command backend**. That path must be migrated and given process/timeout/negative controls before it is used as a generic external-repository executor. Successful reference tests do not establish isolation of that path.
+The migrated payment path is explicitly `bounded_payment_reference_v1`: it measures a service against a verifier-owned instrumented store, not every candidate storage backend, and uses a fixed worker rather than executing historical generated Vitest templates. Preserve this boundary when generalizing the pipeline.
 
 Live Codex/Claude adapters, reusable production CI integration, npm registry publication, independent review and real adopters remain separate milestones. Ordinary deterministic CI stays credential-free.
