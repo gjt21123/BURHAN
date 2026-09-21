@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Phase B: supervised candidate-reference verification
+
+- Remove in-process candidate imports from `packages/codex-runner/src/execution.ts`; execute the reference subject through the bounded local backend.
+- Add the explicit `bounded_payment_reference_v1` profile with a fixed measurement worker, verifier-owned instrumented store, challenge-bound protocol and parent-side acceptance comparison.
+- Run positive/negative controls through the same subprocess harness and compare returned charges as well as counts for same-key, distinct-key and sequential requests.
+- Enforce captured patch/contract/baseline identity, derive protected-path violations independently of candidate metadata, require a matching fresh baseline and check workspace snapshots after execution.
+- Check independently retained compiler-pack hashes before/after probes and validate individual manifest/file bindings, resource limits and unexpected/link entries without changing historical template serialization.
+- Persist safe content-addressed runtime evidence outside the candidate workspace; early zero exits, malformed/replayed output and execution interruptions are incomplete.
+- Enforce every approved documentation term instead of checking only the header token.
+- Add 44 protocol/worker tests, 20 runtime integration cases and six compiler-pack integrity cases. Keep the existing static CLI, process-backend tests and full reference suites.
+- Document that fixed worker execution is distinct from executing historical generated Vitest files, storage-backend verification, generic repository support or sandboxing. No provider calls, npm publication or external adoption are claimed.
+
 ### Phase B: bounded command backend and runtime reference portability
 
 - Add `runLocalCommand`, preserving the old Windows-named export as a compatibility alias.
@@ -12,7 +24,7 @@
 - Compare canonical directory identity in the macOS cwd test rather than treating `/var` and `/private/var` aliases as different directories.
 - Preserve blocked/incomplete outcomes in the command-based evaluator; reject known protected-path violations before execution and check protected files afterwards.
 - Check independently retained legacy validator-pack hashes before/after validators without changing historical serialization or receipt formats.
-- Document that generic repository runtime inputs and the remaining in-process candidate path are still open work. No new live-provider or external-adoption claim.
+- At this increment, generic repository inputs and the in-process candidate path remained open. See the subsequent supervised candidate-reference increment above.
 
 ### Phase A: portable static CLI distribution (0.3.0-preview.1)
 
@@ -29,7 +41,7 @@
 ### Open-source maintenance
 
 - Added Apache-2.0 licensing and NOTICE.
-- Added contribution, security, governance, support, conduct, roadmap and adopter policies; issue forms, PR template, CODEOWNERS and agent guidance.
+- Added contribution, security, governance, support, roadmap, maintainer and release documentation; issue forms, PR template, CODEOWNERS, Dependabot and agent guidance.
 - Reframed the README for ongoing OSS use while preserving historical submission evidence.
 - Added configuration, release, ecosystem and maintainer documentation, plus honest Codex for OSS application drafts.
 

@@ -25,11 +25,13 @@ Read the [CLI command reference](packages/cli/portable/README.md), [Phase A evid
 
 ## Runtime portability: current development
 
-The command-based runtime path now uses a bounded local process backend with cancellation, combined output limits, restricted child environments and explicit cleanup outcomes. The ten deterministic reference suites are exercised on **Linux, macOS and Windows with Node.js 22 and 24** by a separate Runtime verification workflow.
+The command-based runtime path uses a bounded local process backend with cancellation, combined output limits, restricted child environments and explicit cleanup outcomes. The ten deterministic reference suites are exercised on **Linux, macOS and Windows with Node.js 22 and 24** by a separate Runtime verification workflow.
 
-The command-based evaluator retains approved validator-pack hashes independently and checks them around execution. Missing or interrupted execution produces `incomplete`, not an apparent successful result or a normal functional rejection.
+The candidate-verification reference path now imports candidate modules in a **supervised worker, not the verifier process**. Its `bounded_payment_reference_v1` profile uses an instrumented store, positive/negative subprocess controls, strict challenge-bound observations and parent-owned comparisons. It rejects early exits or fabricated pass labels as incomplete, enforces all approved documentation terms, and checks the retained compiler-pack and workspace snapshot around execution. Safe content-addressed runtime evidence is stored outside the candidate workspace.
 
-This is a **reference-workflow portability increment**, not completion of generic runtime verification for arbitrary repositories. The original runtime examples still use BURHAN's fixtures/history, and some legacy in-process execution paths have not been migrated to the supervisor. Read [runtime portability and remaining boundaries](docs/runtime-portability.md) before running unfamiliar code.
+The separately hashed worker uses supported blueprint parameters; it does not execute the historical generated Vitest template files or establish correctness of every candidate storage implementation. Read [bounded reference execution and its precise limits](docs/bounded-reference-runtime.md).
+
+This remains a **reference-workflow increment**, not generic runtime verification for arbitrary repositories. The original runtime examples still use BURHAN's payment fixture/history. Generic repository/contract/qualification inputs, workspace construction and broader runtime examples remain in issue #11. See [runtime portability](docs/runtime-portability.md).
 
 ## Status and intended use
 
@@ -96,13 +98,13 @@ The fixtures include intentionally wrong candidates, protected-path violations a
 | Executor output, patch and completion claim | Cannot determine their own verdict |
 | Validator templates and qualification controls | BURHAN-controlled |
 | Approved pack identity | Retain its seal independently; an adjacent checksum alone is not approval |
-| Independent runtime verification | Uses captured state in a fresh workspace; see actual path limits |
+| Independent runtime verification | Captured state, separate workspace and supervised reference worker; parent compares measurements |
 | Portable static snapshot verification | Committed blobs only; no execution claim |
 | Process supervisor | Bounded local execution, not hostile-code containment |
 | Local signatures and hashes | Artifact integrity, not external certification |
 | Local HTTP API | Loopback/origin/body limits, not authentication or a multi-user service |
 
-Details: [architecture](docs/architecture.md), [threat model](docs/threat-model.md), [runtime boundary](docs/runtime-portability.md), [product specification](docs/product-spec.md), [ecosystem rationale](docs/ecosystem.md).
+Details: [architecture](docs/architecture.md), [threat model](docs/threat-model.md), [runtime boundary](docs/runtime-portability.md), [bounded reference profile](docs/bounded-reference-runtime.md), [product specification](docs/product-spec.md), [ecosystem rationale](docs/ecosystem.md).
 
 ## Codex integration and historical evidence
 
@@ -129,7 +131,7 @@ packages/core                    Contracts, evidence, receipts and state machine
 packages/specforge               Filtered repository facts and contract compiler
 packages/validator-compiler      Trusted validator templates and sealing
 packages/validator-qualification Positive and negative qualification controls
-packages/codex-runner            Codex reference adapter and repair orchestration
+packages/codex-runner            Codex reference adapter, bounded reference worker and repair orchestration
 packages/verifier                Runtime command backend, evidence and verdict logic
 packages/workspace               Workspace and path-safety utilities
 examples/payment-service         Reference bounded coding task
@@ -141,7 +143,7 @@ submission-assets                Historical demonstration media
 
 ## Contribute
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md); coding agents also follow [AGENTS.md](AGENTS.md). Useful work includes negative controls, reproducibility reports, migration of the remaining in-process runtime path, generic repository inputs and additional runtime examples. Describe trust boundaries and actual validation in each PR.
+Read [CONTRIBUTING.md](CONTRIBUTING.md); coding agents also follow [AGENTS.md](AGENTS.md). Useful work includes negative controls, reproducibility reports, generic repository inputs and additional runtime examples. Describe trust boundaries and actual validation in each PR.
 
 - [Roadmap](ROADMAP.md) and [governance](GOVERNANCE.md)
 - [Maintainer guide](docs/maintainer-guide.md), [support](SUPPORT.md) and [Code of Conduct](CODE_OF_CONDUCT.md)

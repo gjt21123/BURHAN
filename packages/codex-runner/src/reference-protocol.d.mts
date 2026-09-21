@@ -1,0 +1,13 @@
+export const REFERENCE_PROTOCOL: string;
+export const REFERENCE_PROFILE: string;
+export function digest(bytes: string | Uint8Array): string;
+export function relativeReferencePath(value: unknown): string;
+export function referenceFile(root: string, relative: string): Promise<string>;
+export function readBoundedFile(filename: string, maxBytes?: number): Promise<Buffer>;
+export function snapshotReference(root: string): Promise<{ files: Array<{ path: string; hash: string; executable: boolean }>; hash: string }>;
+export type ProbeRequest = { protocol: string; nonce: string; modulePath: string; exportName: string; keys: string[]; amount: number; sequential: boolean };
+export type Observation = { created: number; completed: number; createdKeys: string[]; createdAmounts: number[]; matchingResults: number };
+export type ProbeFrame = { protocol: string; nonce: string; observation: Observation | null; error: 'SUBJECT_IMPORT_FAILED' | 'SUBJECT_INVALID' | 'SUBJECT_THREW' | null };
+export function validateProbeRequest(value: unknown): ProbeRequest;
+export function parseProbeOutput(bytes: Buffer, nonce: string): ProbeFrame;
+export function judgeObservation(observation: Observation, keys: string[], amount: number): boolean;
