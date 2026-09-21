@@ -8,7 +8,7 @@
     "./demo-reset": "./src/demo-reset.ts"
   },
   "scripts": {
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --passWithNoTests && node --test tests/reference-protocol.node.mjs",
     "typecheck": "tsc --noEmit",
     "eval:fixtures": "tsx ../validator-compiler/src/evals/fixture-runner.ts",
     "eval:executor:fixtures": "tsx src/evals/executor-fixtures.ts",
