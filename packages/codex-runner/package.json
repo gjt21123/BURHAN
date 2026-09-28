@@ -29,7 +29,7 @@
     "@burhan/core": "0.1.0",
     "@burhan/validator-compiler": "0.1.0",
     "@burhan/workspace": "0.1.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",

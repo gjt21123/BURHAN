@@ -11,7 +11,7 @@
   "dependencies": {
     "@burhan/codex-runner": "0.1.0",
     "@burhan/core": "0.1.0",
-    "zod": "^3.25.76"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
